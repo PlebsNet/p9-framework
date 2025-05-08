@@ -74,7 +74,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${commitmono.variable} antialiased`}>
         <Providers>
           <Navigation />
-          {children}
+          <main>
+            {children}
+          </main>
           <Footer />
         </Providers>
         <Analytics />

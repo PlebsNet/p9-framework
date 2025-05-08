@@ -38,8 +38,8 @@ export default function ArchetypeRadar({
       <Radar
         name={name}
         dataKey="score"
-        stroke="#4F46E5"
-        fill="#4F46E5"
+        stroke="#7598F9"
+        fill="#7598F9"
         fillOpacity={0.6}
       />
       <Tooltip />

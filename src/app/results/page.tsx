@@ -10,7 +10,7 @@ import DimensionRadar from "@/components/DimensionRadar";
 import PracticalApplications from "@/components/PracticalApplications";
 import PersonalizedInsights from "@/components/PersonalizedInsights";
 import LabelFeedback from "@/components/LabelFeedback";
-import { ArchetypeIcon } from "@/components/Icons";
+import { ArchetypeAvatars } from "@/components/ArchetypeAvatars";
 import { SaveBanner } from "@/components/SaveBanner";
 
 // Must match STORAGE_ANS from the questionnaire page
@@ -115,7 +115,7 @@ export default function ResultsPage() {
 
       {/* Primary Archetype Detail */}
       <section className="bg-blue-50 p-4 rounded shadow flex items-start space-x-4">
-        <div>{ArchetypeIcon[primary.slug]}</div>
+        <div>{ArchetypeAvatars[primary.slug]}</div>
         <div>
           <h3 className="text-xl font-semibold">{primary.name}</h3>
           <p className="mt-1 mb-2">Score: {primary.score.toFixed(2)}</p>

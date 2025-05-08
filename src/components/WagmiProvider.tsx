@@ -2,22 +2,12 @@
 
 import { PropsWithChildren, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createConfig, http, WagmiProvider as _WagmiProvider } from 'wagmi';
-import { base, mainnet, optimism } from 'wagmi/chains';
-import { injected, metaMask, safe, walletConnect } from 'wagmi/connectors';
+import { WagmiProvider as _WagmiProvider } from 'wagmi';
 
-export const config = createConfig({
-  chains: [mainnet, base],
-  connectors: [
-    injected(),
-    metaMask(),
-    safe(),
-  ],
-  transports: {
-    [mainnet.id]: http(),
-    [base.id]: http(),
-  },
-});
+
+import { config } from "@/lib/wagmiConfig"
+
+
 
 export default function WagmiProvider({ children }: PropsWithChildren) {
   // Create one QueryClient per app instance
