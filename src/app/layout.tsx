@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/react';
 import { meta } from '@/config/constants';
 import { Providers } from "./providers";
-import { inter, commitmono } from "@/lib/fonts";
+import { inter, commitmono } from "@/fonts";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";
@@ -74,7 +74,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${commitmono.variable} antialiased`}>
         <Providers>
           <Navigation />
-          {children}
+          <main>
+            {children}
+          </main>
           <Footer />
         </Providers>
         <Analytics />

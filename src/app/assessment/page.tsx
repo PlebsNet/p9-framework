@@ -13,7 +13,7 @@ const STORAGE_ANS = "p9_answers";
 const STORAGE_IDX = "p9_currentIndex";
 const STORAGE_TEST = "p9_testId";
 
-export default function Questionnaire() {
+export default function Assessment() {
   const router = useRouter();
   const total = questions.length;
 
@@ -77,7 +77,7 @@ export default function Questionnaire() {
         }
 
         // analytics (fire-and-forget)
-        try { track("Completed Questionnaire"); } catch { }
+        try { track("Completed Assessment"); } catch { }
 
         // Navigate to results (answers/testId still in sessionStorage)
         router.push("/results");

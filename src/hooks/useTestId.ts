@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 /**
- * Pulls the testId from sessionStorage (set in questionnaire).
+ * Pulls the testId from sessionStorage (set in assessment).
  * Returns null if none is found.
  */
 export function useTestId(): string | null {

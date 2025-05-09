@@ -34,7 +34,7 @@ const ReassessmentBanner: React.FC = () => {
       <p>
         It’s been a while since your last assessment.{" "}
         <Link
-          href="/questionnaire"
+          href="/assessment"
           className="underline font-semibold text-blue-600 hover:text-blue-800"
         >
           Re-take the P9 Assessment

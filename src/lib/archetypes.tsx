@@ -7,19 +7,24 @@ export interface Applications {
 export interface Archetype {
   slug: string;
   name: string;
+  signature: string;
   description: string;
   strengths: string[];
   challenges: string[];
   recommendations: string[];
   applications: Applications;
+  primaryTraits: string[];
+  cognitiveFrame?: string;
+  sources?: string[];
 }
 
 export const archetypes: Archetype[] = [
   {
     slug: "visionary",
     name: "Visionary",
+    signature: "Strategic vision generation",
     description:
-      "Creative, forward-thinking ideators who envision bold futures and possibilities.",
+      "Visionary ideators who generate creative, future-oriented strategies and inspire others toward bold possibilities.",
     strengths: [
       "Innovative idea generation",
       "Big-picture strategic thinking",
@@ -35,34 +40,37 @@ export const archetypes: Archetype[] = [
       "Pair with detail-focused partners",
       "Use milestone tracking tools to stay grounded",
     ],
+    primaryTraits: ["Openness", "Strategic", "Intrinsic"],
+    cognitiveFrame: "Vision-based ideation",
+    sources: ["Costa & McCrae (1992)", "Ryan & Deci (2000)", "Epstein (1994)"],
     applications: {
       growth: [
-        // Epstein’s Cognitive-Experiential Self-Theory
-        "Alternate “blue-sky” ideation phases with analytical reality checks to balance creativity and feasibility (Epstein, 1994).",
-        // Self-Determination Theory
-        "Use autonomy-supportive framing (“How might you…?”) to fuel intrinsic motivation for ideation (Ryan & Deci, 2000).",
+        // Epstein’s Cognitive-Experiential Self-Theory (Epstein, 1994)
+        "Alternate “blue-sky” ideation phases with analytical reality checks to balance creativity and feasibility.",
+        // Self-Determination Theory (Ryan & Deci, 2000)
+        "Use autonomy-supportive framing (“How might you…?”) to fuel intrinsic motivation for ideation.",
         // Metacognition research (Schraw & Dennison, 1994)
         "Keep a weekly journal: note which ideas advanced vs. stalled to refine idea-to-action ratios.",
-        // Psychological distancing
-        "Use “third-person self-talk” when evaluating big ideas to reduce bias and over-optimism (Kross et al., 2014).",
-        // Chunking strategy
-        "Break visionary concepts into 3–5 actionable milestones to reduce overwhelm (Miller, 1956).",
+        // Psychological distancing (Kross et al., 2014).
+        "Use “third-person self-talk” when evaluating big ideas to reduce bias and over-optimism",
+        // Chunking strategy (Miller, 1956)
+        "Break visionary concepts into 3–5 actionable milestones to reduce overwhelm.",
       ],
       collaboration: [
-        // Belbin Team Roles
-        "Pair with an Integrator or Guardian who naturally handles detail and follow-through (Belbin, 2010).",
-        // Kotter’s change model
-        "Lead with a “vision rally,” then establish concrete “short-term wins” to maintain momentum (Kotter, 1996).",
-        // Nolan’s “pitch and pull”
-        "Frame bold ideas (“pitch”), then solicit structured feedback (“pull”) to refine and align (Nolan, 2005).",
-        // Shared mental models
-        "Co-create simple visual roadmaps so all team members see both the big picture and next steps (Mathieu et al., 2000).",
-        // Psychological safety
-        "Foster an environment where “wild ideas” are welcomed before feasibility is critiqued (Edmondson, 1999).",
+        // Belbin Team Roles (Belbin, 2010)
+        "Pair with an Integrator or Guardian who naturally handles detail and follow-through.",
+        // Kotter’s change model (Kotter, 1996)
+        "Lead with a “vision rally,” then establish concrete “short-term wins” to maintain momentum.",
+        // Nolan’s “pitch and pull” (Nolan, 2005)
+        "Frame bold ideas (“pitch”), then solicit structured feedback (“pull”) to refine and align.",
+        // Shared mental models (Mathieu et al., 2000)
+        "Co-create simple visual roadmaps so all team members see both the big picture and next steps.",
+        // Psychological safety (Edmondson, 1999)
+        "Foster an environment where “wild ideas” are welcomed before feasibility is critiqued.",
       ],
       career: [
-        // Corporate foresight
-        "Seek roles in strategic foresight or innovation labs, where big-picture thinking is core (O’Connor & McDermott, 2004).",
+        // Corporate foresight (O’Connor & McDermott, 2004)
+        "Seek roles in strategic foresight or innovation labs, where big-picture thinking is core.",
         // Advisory & board work
         "Consider non-executive directorships to leverage vision without day-to-day operations.",
         // Entrepreneurship
@@ -77,8 +85,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "innovator",
     name: "Innovator",
+    signature: "Systematic innovation",
     description:
-      "Systematic creators who blend analytical rigor with creative solutions to optimize processes.",
+      "Systematic creators who blend analytical rigor and creative problem-solving to optimize processes and drive progress.",
     strengths: [
       "Structured creativity",
       "Methodical problem-solving",
@@ -94,24 +103,27 @@ export const archetypes: Archetype[] = [
       "Practice rapid prototyping techniques",
       "Balance rigor with periodic creative play",
     ],
+    primaryTraits: ["Conscientiousness", "Analytical", "Creative"],
+    cognitiveFrame: "Structured creative problem-solving",
+    sources: ["Stanovich & West (2000)", "Ries (2011)", "Michalko (2006)"],
     applications: {
       growth: [
-        // Dual-Process Theory
-        "Alternate structured problem-solving blocks with unconstrained brainstorming to optimize creativity (Stanovich & West, 2000).",
+        // Dual-Process Theory (Stanovich & West, 2000)
+        "Alternate structured problem-solving blocks with unconstrained brainstorming to optimize creativity.",
         // Lean Startup / Ries (2011)
         "Adopt MVP cycles: build → measure → learn to validate solutions rapidly and avoid perfectionism.",
-        // Cognitive load theory
-        "Use checklists to free working memory during complex analyses (Sweller, 1988).",
-        // SCAMPER technique
-        "Regularly apply SCAMPER (Substitute, Combine, Adapt…) to existing processes for systematic innovation (Michalko, 2006).",
+        // Cognitive load theory (Sweller, 1988)
+        "Use checklists to free working memory during complex analyses.",
+        // SCAMPER technique (Michalko, 2006)
+        "Regularly apply SCAMPER (Substitute, Combine, Adapt…) to existing processes for systematic innovation.",
         // Time-boxing
         "Set fixed time slots for deep analysis vs. creative play to prevent overanalysis.",
       ],
       collaboration: [
-        // Collective intelligence
-        "Host cross-functional ideation sessions using structured frameworks (e.g., “brainwriting”) to tap diverse expertise (Woolley et al., 2010).",
-        // Process documentation
-        "Publish clear process maps (SIPOC) so teams can adopt improvements consistently (Hammer & Champy, 1993).",
+        // Collective intelligence (Woolley et al., 2010)
+        "Host cross-functional ideation sessions using structured frameworks (e.g., “brainwriting”) to tap diverse expertise.",
+        // Process documentation (Hammer & Champy, 1993)
+        "Publish clear process maps (SIPOC) so teams can adopt improvements consistently.",
         // Rapid prototyping workshops
         "Facilitate hands-on prototyping jams where users co-design under your guidance.",
         // Feedback loops
@@ -134,10 +146,74 @@ export const archetypes: Archetype[] = [
     },
   },
   {
+    slug: "integrator",
+    name: "Integrator",
+    signature: "Adaptive team unification",
+    description:
+      "Adaptive team players who unify diverse perspectives and flexibly bridge roles to enable collaboration.",
+    strengths: [
+      "Exceptional adaptability",
+      "Balanced skill set across dimensions",
+      "Effective at unifying teams",
+    ],
+    challenges: [
+      "May lack a clear specialty",
+      "Risk of overextending",
+      "Can struggle to prioritize tasks",
+    ],
+    recommendations: [
+      "Define core focus areas for each project",
+      "Use time-blocking for task prioritization",
+      "Leverage specialist support when needed",
+    ],
+    primaryTraits: ["Adaptability", "Collaborative", "Balanced"],
+    cognitiveFrame: "Flexible systems integration",
+    sources: ["Goldratt (1990)", "Newport (2016)", "Woolley et al. (2010)"],
+    applications: {
+      growth: [
+        // Role diversification
+        "Rotate through different project roles quarterly to deepen expertise without losing breadth.",
+        // Time-blocking (Newport, 2016)
+        "Allocate alternating deep-work and context-switch blocks to protect focus.",
+        // Boundary setting
+        "Use explicit “in/out of role” signals (e.g., calendar color-coding) to manage expectations.",
+        // Systems thinking (Goldratt, 1990)
+        "Map end-to-end value streams to identify integration points.",
+        // Self-compassion (Neff, 2003)
+        "Practice self-compassion exercises to prevent burnout from overextension.",
+      ],
+      collaboration: [
+        // Cross-pollination forums
+        "Host monthly “show-and-tell” where teams share successes and lessons learned.",
+        // RACI coordination
+        "Develop lightweight RACI or DACI charts to clarify decision roles across functions.",
+        // Integration stand-ups
+        "Run brief daily cross-team syncs to surface blockers and dependencies.",
+        // Knowledge repositories
+        "Maintain a centralized wiki for process flows and integration guidelines.",
+        // Mentoring circles
+        "Lead triad mentoring groups to share best practices and build collective intelligence.",
+      ],
+      career: [
+        // Program/portfolio management
+        "Manage multi-project portfolios in PMO or PM roles that demand broad oversight.",
+        // Product owner
+        "Serve as the single point of integration between business stakeholders and delivery teams.",
+        // Management consulting
+        "Advise clients on systems integration and process alignment.",
+        // Enterprise architecture
+        "Design organizational or IT architectures that unify diverse components.",
+        // Generalist leadership
+        "Act as a Chief of Staff or operations lead in dynamic, high-change environments.",
+      ],
+    },
+  },
+  {
     slug: "commander",
     name: "Commander",
+    signature: "Goal-driven authority",
     description:
-      "Assertive leaders who drive teams toward high-stakes goals with discipline and authority.",
+      "Goal-driven authorities who lead teams with assertiveness, discipline, and decisive focus on high-stakes objectives.",
     strengths: [
       "Decisive, goal-oriented leadership",
       "High energy and assertiveness",
@@ -153,14 +229,17 @@ export const archetypes: Archetype[] = [
       "Cultivate active listening practices",
       "Include collaborative decision checkpoints",
     ],
+    primaryTraits: ["Extraversion", "Assertive", "Goal-Oriented"],
+    cognitiveFrame: "Directive, outcome-focused leadership",
+    sources: ["Bass & Avolio (1994)", "Goleman (1998)", "Kabat-Zinn (1994)"],
     applications: {
       growth: [
         // Transformational leadership (Bass & Avolio, 1994)
         "Practice crafting inspiring vision statements that connect to team values.",
         // Emotional Intelligence (Goleman, 1998)
         "Engage in EI workshops to improve empathy and reduce perceived authoritarianism.",
-        // Mindful leadership
-        "Incorporate brief daily mindfulness breaks to lower stress and enhance presence (Kabat-Zinn, 1994).",
+        // Mindful leadership (Kabat-Zinn, 1994)
+        "Incorporate brief daily mindfulness breaks to lower stress and enhance presence.",
         // 360-degree feedback
         "Use structured 360 surveys to uncover blind spots in decision style.",
         // Assertiveness training
@@ -195,8 +274,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "influencer",
     name: "Influencer",
+    signature: "Relational persuasion",
     description:
-      "Empathic networkers who excel at persuasion, relationship building, and community engagement.",
+      "Persuasive relationship-builders who use empathy and social intelligence to engage communities and foster connections.",
     strengths: [
       "High emotional intelligence",
       "Natural persuasion and rapport-building",
@@ -212,6 +292,9 @@ export const archetypes: Archetype[] = [
       "Prioritize deep one-on-one connections",
       "Use agendas to stay on task in meetings",
     ],
+    primaryTraits: ["Agreeableness", "Empathy", "Persuasive"],
+    cognitiveFrame: "Relational, socially attuned influence",
+    sources: ["Cialdini (2006)", "Rogers (1957)", "Burt (2000)"],
     applications: {
       growth: [
         // Social network theory (Burt, 2000)
@@ -220,8 +303,8 @@ export const archetypes: Archetype[] = [
         "Practice reciprocity and social proof when persuading stakeholders.",
         // Active empathetic listening (Rogers, 1957)
         "Reflect back feelings during conversations to deepen rapport.",
-        // Emotional contagion research
-        "Leverage positive affect—smile and posture—to boost group mood (Hatfield et al., 1994).",
+        // Emotional contagion research (Hatfield et al., 1994)
+        "Leverage positive affect—smile and posture—to boost group mood.",
         // Storytelling skills
         "Develop narrative competence by practicing “problem → solution → impact” pitches.",
       ],
@@ -254,8 +337,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "strategist",
     name: "Strategist",
+    signature: "Analytical foresight",
     description:
-      "Long-term planners who evaluate risks and opportunities to chart optimal pathways forward.",
+      "Analytical planners who anticipate risks and opportunities to chart and optimize long-term pathways forward.",
     strengths: [
       "Exceptional planning and foresight",
       "Risk analysis abilities",
@@ -271,6 +355,9 @@ export const archetypes: Archetype[] = [
       "Balance long-range and short-term goals",
       "Use decision matrices to streamline choices",
     ],
+    primaryTraits: ["Analytical", "Conscientiousness", "Foresight"],
+    cognitiveFrame: "Scenario-based strategic analysis",
+    sources: ["Schwartz (1991)", "Kepner-Tregoe", "Nemeth (1995)"],
     applications: {
       growth: [
         // Scenario planning (Schwartz, 1991)
@@ -293,8 +380,8 @@ export const archetypes: Archetype[] = [
         "Translate strategy into KPIs across Finance, Customer, Process, Learning.",
         // Cross-functional councils
         "Organize regular cross-dept strategy reviews to maintain alignment.",
-        // Cognitive diversity
-        "Invite contrarian viewpoints to stress-test strategic plans (Nemeth, 1995).",
+        // Cognitive diversity (Nemeth, 1995)
+        "Invite contrarian viewpoints to stress-test strategic plans.",
       ],
       career: [
         // Management consulting
@@ -313,8 +400,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "investigator",
     name: "Investigator",
+    signature: "Ethical deep inquiry",
     description:
-      "Inquisitive researchers driven by ethical rigor and deep analytical inquiry.",
+      "Ethical researchers who pursue deep analytical inquiry and uphold rigorous standards of integrity.",
     strengths: [
       "Thorough research skills",
       "High integrity and ethical standards",
@@ -330,6 +418,9 @@ export const archetypes: Archetype[] = [
       "Practice summary and synthesis techniques",
       "Use visual aids to present complex data",
     ],
+    primaryTraits: ["Integrity", "Analytical", "Detail-Oriented"],
+    cognitiveFrame: "Systematic, ethical investigation",
+    sources: ["De Bono (1967)", "Barrett (2001)", "Rosenberg (2003)"],
     applications: {
       growth: [
         // Meta-cognitive summaries
@@ -338,8 +429,8 @@ export const archetypes: Archetype[] = [
         "Set clear stopping criteria (e.g., 20 articles) to avoid endless research loops.",
         // Synthesis frameworks
         "Use frameworks like PICO (medicine) or SWOT for structured insight generation.",
-        // Lateral thinking
-        "Practice “random entry” provocations to break analytical blind spots (De Bono, 1967).",
+        // Lateral thinking (De Bono, 1967)
+        "Practice “random entry” provocations to break analytical blind spots.",
         // Data triangulation
         "Combine qualitative and quantitative sources for robust conclusions.",
       ],
@@ -372,8 +463,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "mediator",
     name: "Mediator",
+    signature: "Compassionate conflict navigation",
     description:
-      "Compassionate harmonizers who navigate conflicts and foster cooperative environments.",
+      "Compassionate harmonizers who resolve conflict and foster consensus through empathy and cooperative dialogue.",
     strengths: [
       "Strong conflict resolution skills",
       "High empathy and compassion",
@@ -389,22 +481,25 @@ export const archetypes: Archetype[] = [
       "Set clear conflict-resolution protocols",
       "Schedule personal decompression time",
     ],
+    primaryTraits: ["Empathy", "Cooperation", "Conflict Resolution"],
+    cognitiveFrame: "Consensus-building through perspective-taking",
+    sources: ["Kabat-Zinn (1994)", "Barrett (2001)", "Rosenberg (2003)"],
     applications: {
       growth: [
         // Thomas-Kilmann Conflict Mode Instrument
         "Learn to flex between competing, avoiding, accommodating, collaborating, and compromising (TKI).",
         // Mindfulness (Kabat-Zinn, 1994)
         "Daily mindfulness practice to center yourself before engaging in conflict.",
-        // Perspective-taking
-        "Use role-play exercises to deliberately adopt others’ viewpoints (Galinsky et al., 2008).",
-        // Nonviolent Communication
-        "Apply NVC’s observation-feeling-need-request model to clear communication (Rosenberg, 2003).",
-        // Emotional granularity
-        "Label emotions precisely to avoid conflating different feelings (Barrett, 2001).",
+        // Perspective-taking (Galinsky et al., 2008)
+        "Use role-play exercises to deliberately adopt others’ viewpoints.",
+        // Nonviolent Communication (Rosenberg, 2003)
+        "Apply NVC’s observation-feeling-need-request model to clear communication.",
+        // Emotional granularity (Barrett, 2001)
+        "Label emotions precisely to avoid conflating different feelings.",
       ],
       collaboration: [
-        // Liberating Structures
-        "Use facilitation formats like “1-2-4-All” to ensure every voice is heard (Lipmanowicz & McCandless).",
+        // Liberating Structures (Lipmanowicz & McCandless)
+        "Use facilitation formats like “1-2-4-All” to ensure every voice is heard.",
         // Empathy mapping
         "Lead workshops to map stakeholder thoughts, feelings, and needs to foster understanding.",
         // Mediation frameworks
@@ -431,8 +526,9 @@ export const archetypes: Archetype[] = [
   {
     slug: "guardian",
     name: "Guardian",
+    signature: "Structured operational reliability",
     description:
-      "Dependable executors who ensure stability, compliance, and ethical standards.",
+      "Reliable executors who maintain stability, ensure compliance, and uphold organizational standards with consistency.",
     strengths: [
       "Highly reliable and responsible",
       "Strong adherence to rules and policies",
@@ -448,18 +544,21 @@ export const archetypes: Archetype[] = [
       "Build in flexible exception protocols",
       "Use scenario planning for ambiguity management",
     ],
+    primaryTraits: ["Conscientiousness", "Reliable", "Structured"],
+    cognitiveFrame: "Stability-focused operational execution",
+    sources: ["Fleeson & Jayawickreme (2015)", "Beck (1976)", "Meichenbaum (1985)"],
     applications: {
       growth: [
         // Fleeson & Jayawickreme (2015)
         "Practice situational role-plays to build adaptability under ambiguity.",
         // Adaptive self-regulation
         "Use cyclical PDSA (Plan-Do-Study-Act) to iterate processes without chaos.",
-        // Cognitive reframing
-        "Apply cognitive restructuring to reinterpret uncertainty as opportunity (Beck, 1976).",
+        // Cognitive reframing (Beck, 1976)
+        "Apply cognitive restructuring to reinterpret uncertainty as opportunity.",
         // Policy review cycles
         "Schedule quarterly reviews to update procedures based on new data.",
-        // Stress inoculation
-        "Gradually expose yourself to controlled ambiguity to build tolerance (Meichenbaum, 1985).",
+        // Stress inoculation (Meichenbaum, 1985)
+        "Gradually expose yourself to controlled ambiguity to build tolerance.",
       ],
       collaboration: [
         // SOP co-creation
@@ -484,65 +583,6 @@ export const archetypes: Archetype[] = [
         "Manage operations where maintenance and safety are paramount.",
         // Standards development
         "Work with ISO or industry bodies to draft and maintain global standards.",
-      ],
-    },
-  },
-  {
-    slug: "integrator",
-    name: "Integrator",
-    description:
-      "Versatile collaborators who adapt fluidly to roles and bridge diverse perspectives.",
-    strengths: [
-      "Exceptional adaptability",
-      "Balanced skill set across dimensions",
-      "Effective at unifying teams",
-    ],
-    challenges: [
-      "May lack a clear specialty",
-      "Risk of overextending",
-      "Can struggle to prioritize tasks",
-    ],
-    recommendations: [
-      "Define core focus areas for each project",
-      "Use time-blocking for task prioritization",
-      "Leverage specialist support when needed",
-    ],
-    applications: {
-      growth: [
-        // Role diversification
-        "Rotate through different project roles quarterly to deepen expertise without losing breadth.",
-        // Time-blocking
-        "Allocate alternating deep-work and context-switch blocks to protect focus (Newport, 2016).",
-        // Boundary setting
-        "Use explicit “in/out of role” signals (e.g., calendar color-coding) to manage expectations.",
-        // Systems thinking
-        "Map end-to-end value streams to identify integration points (Goldratt, 1990).",
-        // Self-compassion
-        "Practice self-compassion exercises to prevent burnout from overextension (Neff, 2003).",
-      ],
-      collaboration: [
-        // Cross-pollination forums
-        "Host monthly “show-and-tell” where teams share successes and lessons learned.",
-        // RACI coordination
-        "Develop lightweight RACI or DACI charts to clarify decision roles across functions.",
-        // Integration stand-ups
-        "Run brief daily cross-team syncs to surface blockers and dependencies.",
-        // Knowledge repositories
-        "Maintain a centralized wiki for process flows and integration guidelines.",
-        // Mentoring circles
-        "Lead triad mentoring groups to share best practices and build collective intelligence.",
-      ],
-      career: [
-        // Program/portfolio management
-        "Manage multi-project portfolios in PMO or PM roles that demand broad oversight.",
-        // Product owner
-        "Serve as the single point of integration between business stakeholders and delivery teams.",
-        // Management consulting
-        "Advise clients on systems integration and process alignment.",
-        // Enterprise architecture
-        "Design organizational or IT architectures that unify diverse components.",
-        // Generalist leadership
-        "Act as a Chief of Staff or operations lead in dynamic, high-change environments.",
       ],
     },
   },
