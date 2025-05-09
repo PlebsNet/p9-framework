@@ -1,48 +1,133 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
-  RadarChart,
   Radar,
+  RadarChart,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
   Tooltip,
 } from "recharts";
-import { Centroid } from "@/lib/archetypeCentroids";
+import type { Centroid } from "@/lib/archetypeCentroids";
 
 interface ArchetypeRadarProps {
+  data: Centroid[];
   slug: string;
   name: string;
-  // We know each Centroid has a `dimension` and also a numeric value at [slug]
-  data: Centroid[];
+  width?: number;
+  height?: number;
+  showTooltip?: boolean;
+  withReferenceBands?: boolean;
+  tickLabels?: boolean;
 }
 
 export default function ArchetypeRadar({
+  data,
   slug,
   name,
-  data,
+  width = 300,
+  height = 300,
+  showTooltip = true,
+  withReferenceBands = true,
+  tickLabels = true,
 }: ArchetypeRadarProps) {
-  // Map Centroid[] to the shape recharts expects
   const chartData = data.map((d) => ({
     dimension: d.dimension,
-    // TS knows Centroid has an index signature for slug
     score: d[slug] as number,
   }));
 
+  // Hydration guard for tooltip
+  const [mounted, setMounted] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | undefined>();
+  const handleMouseMove = (e: any) => {
+    if (e && typeof e.chartX === "number" && typeof e.chartY === "number") {
+      setTooltipPos({ x: e.chartX, y: e.chartY });
+    }
+  };
+  const handleMouseLeave = useCallback(() => {
+    setTooltipPos(undefined);
+  }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+
   return (
-    <RadarChart width={300} height={300} data={chartData} outerRadius={120}>
+    <RadarChart
+      width={width}
+      height={height}
+      data={chartData}
+      outerRadius={120}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <PolarGrid />
-      <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 12 }} />
-      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
+      <PolarAngleAxis dataKey="dimension" tick={tickLabels ? { fontSize: 12 } : false} />
+      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+      {withReferenceBands && (
+        <>
+          <Radar
+            name="25th Percentile"
+            dataKey={() => 25}
+            stroke="#ddd"
+            fill="#eee"
+            fillOpacity={0.05}
+            isAnimationActive={false}
+          />
+          <Radar
+            name="50th Percentile"
+            dataKey={() => 50}
+            stroke="#ccc"
+            fill="#ccc"
+            fillOpacity={0.05}
+            isAnimationActive={false}
+          />
+          <Radar
+            name="75th Percentile"
+            dataKey={() => 75}
+            stroke="#ddd"
+            fill="#eee"
+            fillOpacity={0.05}
+            isAnimationActive={false}
+          />
+        </>
+      )}
       <Radar
-        name={name}
         dataKey="score"
-        stroke="#4F46E5"
-        fill="#4F46E5"
-        fillOpacity={0.6}
+        stroke="#3a5fcd"
+        fill="#3a5fcd"
+        fillOpacity={0.8}
       />
-      <Tooltip />
+      {showTooltip && tooltipPos && (
+        <Tooltip
+          position={tooltipPos}
+          wrapperStyle={{
+            pointerEvents: "none",
+            transition: "opacity 150ms ease-in-out",
+            opacity: tooltipPos ? 1 : 0,
+          }}
+          contentStyle={{
+            backgroundColor: "#000",
+            borderRadius: 10,
+            padding: "8px 12px",
+            border: "none",
+          }}
+          labelStyle={{
+            fontSize: "0.85rem",
+            marginBottom: 4,
+          }}
+          itemStyle={{
+            color: "#fff",
+            fontSize: "1rem",
+          }}
+          labelFormatter={() => name}
+          formatter={(value, key, props) => {
+            const dim = props?.payload?.dimension ?? key;
+            return [`${value}`, `${dim}`];
+          }}
+        />
+      )}
     </RadarChart>
   );
 }

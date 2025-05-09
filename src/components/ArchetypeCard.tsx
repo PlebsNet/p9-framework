@@ -1,40 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { Centroid } from "@/lib/archetypeCentroids";
-import { ArchetypeIcon } from "./Icons";
-import ClientRadar from "@/components/ClientRadar";
+import { archetypes, type Archetype } from "@/lib/archetypes";
+import { ArchetypeAvatars, type ArchetypeSlug } from "./ArchetypeAvatars";
+import ArchetypeRadar from "@/components/ArchetypeRadar";
+import { Plus } from '@/components/Icons';
 
-export interface ArchetypeCardProps {
-  slug: string;
-  name: string;
-  signature: string;
+interface Props {
+  slug: ArchetypeSlug;
   centroid: Centroid[];
 }
 
-export function ArchetypeCard({
-  slug,
-  name,
-  signature,
-  centroid,
-}: ArchetypeCardProps) {
+export function ArchetypeCard({ slug, centroid }: Props) {
+  const archetype = archetypes.find((a) => a.slug === slug);
+  if (!archetype) {
+    throw new Error(`Unknown archetype slug "${slug}"`);
+  }
+  const { name, signature } = archetype;
+
   return (
     <Link
       href={`/archetype/${slug}`}
-      className="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg transition flex flex-col items-center"
+      className="group rounded-2xl bg-zinc-900 border hover:bg-zinc-800/60 border-zinc-800 p-6 shadow hover:shadow-lg transition flex flex-col items-center"
     >
-      <div className="mb-4 w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-        {ArchetypeIcon[slug]}
+      <div className="mb-4 w-16 h-16">
+        {ArchetypeAvatars[slug]}
       </div>
 
       <h3 className="text-xl font-semibold mb-1">{name}</h3>
-      <p className="text-gray-600 text-center mb-4">{signature}</p>
+      <p className="text-center mb-4">{signature}</p>
 
-      <ClientRadar data={centroid} slug={slug} name={name} />
+      <ArchetypeRadar data={centroid} slug={slug} name={name} withReferenceBands showTooltip />
 
-      <span className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition">
-        Learn More
+      <span className="self-end group-hover:border-zinc-800 group-hover:bg-zinc-800 flex items-center border border-zinc-800 rounded-full justify-center m-0 p-0 transition-all duration-150 ease-in-out h-12 w-12">
+        <Plus />
       </span>
     </Link>
   );

@@ -1,4 +1,4 @@
-// components/SaveBanner.tsx
+// components/SaveArchetype.tsx
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
@@ -11,7 +11,7 @@ const STORAGE_ANS = "p9_answers";
 const STORAGE_IDX = "p9_currentIndex";
 const STORAGE_TEST = "p9_testId";
 
-export function SaveBanner() {
+export function SaveArchetype() {
   const { data: session, status } = useSession();
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -77,7 +77,7 @@ export function SaveBanner() {
 
       setDone(true);
     } catch (err: any) {
-      console.error("SaveBanner error:", err);
+      console.error("SaveArchetype error:", err);
       toast.error(err.message || "Couldn’t save your results");
     } finally {
       setSaving(false);

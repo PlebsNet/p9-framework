@@ -17,7 +17,9 @@ enum Role {
 model User {
   id             String    @id @default(cuid())
   name           String?
-  email          String?   @unique
+  type           String?   // "web2" | "web3" | "anonymous" (added, optional for backward compatibility)
+  email          String?   @unique // optional for Web2
+  wallet         String?   // optional for Web3 (added)
   image          String?
   emailVerified  DateTime?
   archetype      String?
@@ -35,6 +37,8 @@ model User {
 
   accounts Account[]
   sessions Session[]
+
+  rephrases QuestionRephrase[]
 
   @@index([createdAt])
   @@index([lastAssessedAt])
@@ -111,4 +115,20 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+/// Represents a question rephrasing session
+model QuestionRephrase {
+  id               String   @id @default(cuid())
+  userId           String?  // optional
+  user             User?    @relation(fields: [userId], references: [id])
+  sessionId        String?  // for anonymous browser session tracking
+  questionId       String   // ID of the original question
+  originalQuestion String
+  originalAnswer   Int
+  rephrasedPrompt  String   // renamed from refinedPrompt
+  followUpAnswer   String?  // renamed from refinedAnswer, now a string to store text
+  isDoubleNeutral  Boolean? // flag for when both original and follow-up are neutral
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

@@ -7,6 +7,7 @@ export interface Applications {
 export interface Archetype {
   slug: string;
   name: string;
+  signature: string;
   description: string;
   strengths: string[];
   challenges: string[];
@@ -18,6 +19,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "visionary",
     name: "Visionary",
+    signature: "Future-focused ideation",
     description:
       "Creative, forward-thinking ideators who envision bold futures and possibilities.",
     strengths: [
@@ -77,6 +79,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "innovator",
     name: "Innovator",
+    signature: "Structured creativity",
     description:
       "Systematic creators who blend analytical rigor with creative solutions to optimize processes.",
     strengths: [
@@ -134,8 +137,69 @@ export const archetypes: Archetype[] = [
     },
   },
   {
+    slug: "integrator",
+    name: "Integrator",
+    signature: "Versatile problem-solving",
+    description:
+      "Versatile collaborators who adapt fluidly to roles and bridge diverse perspectives.",
+    strengths: [
+      "Exceptional adaptability",
+      "Balanced skill set across dimensions",
+      "Effective at unifying teams",
+    ],
+    challenges: [
+      "May lack a clear specialty",
+      "Risk of overextending",
+      "Can struggle to prioritize tasks",
+    ],
+    recommendations: [
+      "Define core focus areas for each project",
+      "Use time-blocking for task prioritization",
+      "Leverage specialist support when needed",
+    ],
+    applications: {
+      growth: [
+        // Role diversification
+        "Rotate through different project roles quarterly to deepen expertise without losing breadth.",
+        // Time-blocking
+        "Allocate alternating deep-work and context-switch blocks to protect focus (Newport, 2016).",
+        // Boundary setting
+        "Use explicit “in/out of role” signals (e.g., calendar color-coding) to manage expectations.",
+        // Systems thinking
+        "Map end-to-end value streams to identify integration points (Goldratt, 1990).",
+        // Self-compassion
+        "Practice self-compassion exercises to prevent burnout from overextension (Neff, 2003).",
+      ],
+      collaboration: [
+        // Cross-pollination forums
+        "Host monthly “show-and-tell” where teams share successes and lessons learned.",
+        // RACI coordination
+        "Develop lightweight RACI or DACI charts to clarify decision roles across functions.",
+        // Integration stand-ups
+        "Run brief daily cross-team syncs to surface blockers and dependencies.",
+        // Knowledge repositories
+        "Maintain a centralized wiki for process flows and integration guidelines.",
+        // Mentoring circles
+        "Lead triad mentoring groups to share best practices and build collective intelligence.",
+      ],
+      career: [
+        // Program/portfolio management
+        "Manage multi-project portfolios in PMO or PM roles that demand broad oversight.",
+        // Product owner
+        "Serve as the single point of integration between business stakeholders and delivery teams.",
+        // Management consulting
+        "Advise clients on systems integration and process alignment.",
+        // Enterprise architecture
+        "Design organizational or IT architectures that unify diverse components.",
+        // Generalist leadership
+        "Act as a Chief of Staff or operations lead in dynamic, high-change environments.",
+      ],
+    },
+  },
+  {
     slug: "commander",
     name: "Commander",
+    signature: "Directive leadership",
     description:
       "Assertive leaders who drive teams toward high-stakes goals with discipline and authority.",
     strengths: [
@@ -195,6 +259,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "influencer",
     name: "Influencer",
+    signature: "Empathic persuasion",
     description:
       "Empathic networkers who excel at persuasion, relationship building, and community engagement.",
     strengths: [
@@ -254,6 +319,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "strategist",
     name: "Strategist",
+    signature: "Long-term planning",
     description:
       "Long-term planners who evaluate risks and opportunities to chart optimal pathways forward.",
     strengths: [
@@ -313,6 +379,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "investigator",
     name: "Investigator",
+    signature: "Rigorous inquiry",
     description:
       "Inquisitive researchers driven by ethical rigor and deep analytical inquiry.",
     strengths: [
@@ -372,6 +439,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "mediator",
     name: "Mediator",
+    signature: "Team harmony",
     description:
       "Compassionate harmonizers who navigate conflicts and foster cooperative environments.",
     strengths: [
@@ -431,6 +499,7 @@ export const archetypes: Archetype[] = [
   {
     slug: "guardian",
     name: "Guardian",
+    signature: "Reliable execution",
     description:
       "Dependable executors who ensure stability, compliance, and ethical standards.",
     strengths: [
@@ -484,65 +553,6 @@ export const archetypes: Archetype[] = [
         "Manage operations where maintenance and safety are paramount.",
         // Standards development
         "Work with ISO or industry bodies to draft and maintain global standards.",
-      ],
-    },
-  },
-  {
-    slug: "integrator",
-    name: "Integrator",
-    description:
-      "Versatile collaborators who adapt fluidly to roles and bridge diverse perspectives.",
-    strengths: [
-      "Exceptional adaptability",
-      "Balanced skill set across dimensions",
-      "Effective at unifying teams",
-    ],
-    challenges: [
-      "May lack a clear specialty",
-      "Risk of overextending",
-      "Can struggle to prioritize tasks",
-    ],
-    recommendations: [
-      "Define core focus areas for each project",
-      "Use time-blocking for task prioritization",
-      "Leverage specialist support when needed",
-    ],
-    applications: {
-      growth: [
-        // Role diversification
-        "Rotate through different project roles quarterly to deepen expertise without losing breadth.",
-        // Time-blocking
-        "Allocate alternating deep-work and context-switch blocks to protect focus (Newport, 2016).",
-        // Boundary setting
-        "Use explicit “in/out of role” signals (e.g., calendar color-coding) to manage expectations.",
-        // Systems thinking
-        "Map end-to-end value streams to identify integration points (Goldratt, 1990).",
-        // Self-compassion
-        "Practice self-compassion exercises to prevent burnout from overextension (Neff, 2003).",
-      ],
-      collaboration: [
-        // Cross-pollination forums
-        "Host monthly “show-and-tell” where teams share successes and lessons learned.",
-        // RACI coordination
-        "Develop lightweight RACI or DACI charts to clarify decision roles across functions.",
-        // Integration stand-ups
-        "Run brief daily cross-team syncs to surface blockers and dependencies.",
-        // Knowledge repositories
-        "Maintain a centralized wiki for process flows and integration guidelines.",
-        // Mentoring circles
-        "Lead triad mentoring groups to share best practices and build collective intelligence.",
-      ],
-      career: [
-        // Program/portfolio management
-        "Manage multi-project portfolios in PMO or PM roles that demand broad oversight.",
-        // Product owner
-        "Serve as the single point of integration between business stakeholders and delivery teams.",
-        // Management consulting
-        "Advise clients on systems integration and process alignment.",
-        // Enterprise architecture
-        "Design organizational or IT architectures that unify diverse components.",
-        // Generalist leadership
-        "Act as a Chief of Staff or operations lead in dynamic, high-change environments.",
       ],
     },
   },

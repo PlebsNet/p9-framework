@@ -3,7 +3,7 @@ import Link from "next/link";
 import { archetypes } from "@/lib/archetypes";
 import { archetypeCentroids, Centroid } from "@/lib/archetypeCentroids";
 import ArchetypeRadar from "@/components/ArchetypeRadar";
-import { ArchetypeIcon } from "@/components/Icons";
+import { ArchetypeAvatars } from "@/components/ArchetypeAvatars";
 
 interface ArchetypePageProps {
   params: { slug: string };
@@ -39,7 +39,7 @@ export default function ArchetypePage({ params }: ArchetypePageProps) {
     <article className="max-w-3xl mx-auto p-6 space-y-8">
       {/* Icon */}
       <header className="flex justify-center">
-        {ArchetypeIcon[archetype.slug]}
+        {ArchetypeAvatars[archetype.slug]}
       </header>
 
       {/* Title & Description */}
@@ -55,9 +55,11 @@ export default function ArchetypePage({ params }: ArchetypePageProps) {
         </h2>
         <div className="flex justify-center">
           <ArchetypeRadar
+            data={data}
             slug={archetype.slug}
             name={archetype.name}
-            data={data}
+            withReferenceBands
+            showTooltip
           />
         </div>
       </section>

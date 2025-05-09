@@ -2,13 +2,7 @@
 
 import React from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/RadioGroup";
-
-export interface QuestionProps {
-  id: string;
-  text: string;
-  value: number; // 0 = no answer yet
-  onChange: (id: string, value: number) => void;
-}
+import { QuestionProps } from "../types";
 
 const ticks = [
   { value: 1, label: "Strongly Disagree" },
@@ -25,12 +19,15 @@ export default function Question({
   text,
   value,
   onChange,
+  disabled,
+  outlined,
 }: QuestionProps) {
-  // Treat 0 as “no selection”
-  const selected = value > 0 ? String(value) : undefined;
+  // Always provide a string value to RadioGroup, even if it's empty string
+  // This ensures the component stays in controlled mode consistently
+  const selected = value > 0 ? String(value) : "";
 
   return (
-    <div className="mb-8">
+    <div className={`p-4 rounded border ${outlined ? 'border-gray-400 bg-gray-100 opacity-60' : 'border-transparent'}`}>
       <fieldset>
         <legend id={`${id}-legend`} className="block mb-2 font-medium">
           {text}
@@ -43,6 +40,7 @@ export default function Question({
           className="grid grid-cols-7 gap-2"
           required
           aria-labelledby={`${id}-legend`}
+          disabled={disabled}
         >
           {ticks.map((t) => (
             <label
