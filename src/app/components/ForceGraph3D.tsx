@@ -4,9 +4,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useSubscription } from '@apollo/client';
 import gql from 'graphql-tag';
+import { useAccount } from 'wagmi';
 
 interface ForceGraph3DInstance {
   cameraPosition: (pos: { x?: number; y?: number; z?: number }) => void;
+  camera: {
+    position: { x: number; y: number; z: number };
+  };
 }
 
 interface ForceGraph3DProps {
@@ -84,39 +88,41 @@ const CLAIMS_SUBSCRIPTION = gql`
 `;
 
 export default function DynamicGraph({ width, height }: DynamicGraphProps) {
-
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<ForceGraph3DInstance | null>(null);
+  const { address } = useAccount();
   const [data, setData] = useState<GraphData>({ nodes: [], links: [] });
   const nodeMapRef = useRef<Map<string, Node>>(new Map());
   const [isGraphLoaded, setIsGraphLoaded] = useState(false);
-
-  const distance = 600;
+  const [isRotating, setIsRotating] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
+  const angleRef = useRef(0);
+  const distanceRef = useRef(600);
 
   useEffect(() => {
     if (!fgRef.current) return;
 
-    fgRef.current.cameraPosition({ z: distance });
+    // Initialize camera position first
+    fgRef.current.cameraPosition({ z: 600 });
 
     // camera orbit
-    let angle = 0;
     const intervalId = setInterval(() => {
-      if (!fgRef.current) return;
+      if (!fgRef.current || !isRotating || isHovering) return;
+      angleRef.current += Math.PI / 1500;
       fgRef.current.cameraPosition({
-        x: distance * Math.sin(angle),
-        z: distance * Math.cos(angle)
+        x: distanceRef.current * Math.sin(angleRef.current),
+        z: distanceRef.current * Math.cos(angleRef.current)
       });
-      angle += Math.PI / 1500;
     }, 10);
 
     return () => clearInterval(intervalId);
-  }, [isGraphLoaded]);
+  }, [isGraphLoaded, isRotating, isHovering]);
 
   const { data: subscriptionData, loading, error } = useSubscription(CLAIMS_SUBSCRIPTION, {
     variables: {
       where: {
         account_id: {
-          _eq: "0x25d5c9dbc1e12163b973261a08739927e4f72ba8"
+          _eq: address?.toLowerCase() || ''
         }
       }
     }
@@ -131,13 +137,21 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
       const newNodes: Node[] = [];
       const newLinks: Link[] = [];
 
-      // First pass: create all nodes
+      // First pass: create all nodes (including predicates)
       claims.forEach(claim => {
         // Add subject node
         if (!nodeMapRef.current.has(claim.subject.label)) {
           const subjectNode = { id: claim.subject.label, label: claim.subject.label };
           newNodes.push(subjectNode);
           nodeMapRef.current.set(claim.subject.label, subjectNode);
+        }
+
+        // Add predicate node
+        const predicateId = `predicate_${claim.predicate.label}`;
+        if (!nodeMapRef.current.has(predicateId)) {
+          const predicateNode = { id: predicateId, label: claim.predicate.label };
+          newNodes.push(predicateNode);
+          nodeMapRef.current.set(predicateId, predicateNode);
         }
 
         // Add object node
@@ -148,14 +162,23 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
         }
       });
 
-      // Second pass: create all links
+      // Second pass: create links connecting through predicates
       claims.forEach(claim => {
-        const link = {
+        const predicateId = `predicate_${claim.predicate.label}`;
+
+        // Link from subject to predicate
+        newLinks.push({
           source: claim.subject.label,
+          target: predicateId,
+          label: ''
+        });
+
+        // Link from predicate to object
+        newLinks.push({
+          source: predicateId,
           target: claim.object.label,
-          label: claim.predicate.label
-        };
-        newLinks.push(link);
+          label: ''
+        });
       });
 
       console.log('Final graph data:', {
@@ -181,7 +204,42 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
         position: 'relative',
         backgroundColor: '#000000'
       }}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
+      <div
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000,
+          cursor: 'pointer',
+          padding: '8px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onClick={() => setIsRotating(!isRotating)}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            transform: isRotating ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 0.3s ease',
+          }}
+        >
+          <path
+            d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"
+            fill={isRotating ? '#3b82f6' : '#666'}
+          />
+        </svg>
+      </div>
       {data.nodes.length > 0 ? (
         <ForceGraph3D
           ref={(el: ForceGraph3DInstance | null) => {
@@ -195,8 +253,8 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
           nodeColor={() => '#3b82f6'}
           nodeRelSize={6}
           nodeLabel="label"
-          linkColor={() => 'rgba(59, 130, 246, 0.4)'}
-          linkWidth={1}
+          linkColor={() => '#fff'}
+          linkWidth={5}
           backgroundColor="#000000"
           onEngineStop={() => console.log('Engine stopped')}
           showNavInfo={false}

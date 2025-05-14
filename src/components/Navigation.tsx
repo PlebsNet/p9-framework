@@ -10,6 +10,7 @@ import {
   Brain,
   Menu,
   X,
+  Triples,
 } from '@/components/Icons';
 import { AuthPopup } from './AuthPopup';
 import { useState } from 'react';
@@ -81,6 +82,11 @@ export default function Navigation() {
             <Button size="icon" variant="ghost" asChild>
               <Link href="/profile">
                 <User className="w-full h-full" />
+              </Link>
+            </Button>
+            <Button size="icon" variant="ghost" asChild>
+              <Link href="/triples">
+                <Triples className="w-full h-full" />
               </Link>
             </Button>
           </nav>
