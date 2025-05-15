@@ -61,29 +61,13 @@ export default function TriplesPage() {
     const triples = positionsData?.triples || [];
     const total = positionsData?.total.aggregate?.count || 0;
 
-    // Calculate total ETH amount across all positions
-    const totalEthAmount = triples.reduce((sum, triple) => {
-        const vaultPosition = triple.vault?.positions[0];
-        const counterVaultPosition = triple.counter_vault?.positions[0];
-
-        const vaultEthAmount = vaultPosition ? (vaultPosition.shares * triple.vault?.current_share_price) : 0;
-        const counterVaultEthAmount = counterVaultPosition ? (counterVaultPosition.shares * triple.counter_vault?.current_share_price) : 0;
-
-        return sum + vaultEthAmount + counterVaultEthAmount;
-    }, 0);
-
     return (
         <div className="p-4 max-w-6xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">My Triple Positions</h1>
-            <div className="flex justify-between items-center mb-6">
-                <p className="text-sm text-gray-600">Total positions: {total}</p>
-                <p className="text-sm font-medium">
-                    Total Value: {formatUSD(totalEthAmount)}
-                </p>
-            </div>
+            <p className="text-sm text-gray-600 mb-6">Total positions: {total}</p>
 
             {triples.length === 0 ? (
-                <p className="text-gray-600">You don&apos;t have any positions yet.</p>
+                <p className="text-gray-600">You don't have any positions yet.</p>
             ) : (
                 <div className="flex flex-wrap gap-2">
                     {triples.map((triple: NonNullable<GetTriplesWithPositionsQuery['triples']>[number]) => {
