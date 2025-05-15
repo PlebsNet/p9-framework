@@ -1,5 +1,6 @@
 "use client";
 
+import 'aframe';
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useSubscription } from '@apollo/client';
