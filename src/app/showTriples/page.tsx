@@ -5,17 +5,7 @@ import { Card } from '@/components/ui/card'
 import { question } from '@/data/question'
 
 export default function ShowTriplesPage() {
-    const { data, isLoading, error } = useGetTriplesQuery({
-        where: {
-            _or: question.map(q => ({
-                _and: [
-                    { subject: { id: { _eq: q.triple.subject.id } } },
-                    { predicate: { id: { _eq: q.triple.predicate.id } } },
-                    { object: { id: { _eq: q.triple.object.id } } }
-                ]
-            }))
-        }
-    })
+    const { data, isLoading, error } = useGetTriplesQuery()
 
     if (isLoading) {
         return (
