@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import Link from 'next/link';
 import { signOut, signIn } from "next-auth/react";
@@ -15,7 +15,7 @@ export default function WalletConnect() {
   const { data: session } = useSession();
   const isSignedIn = useIsSignedIn();
   const pathname = usePathname();
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const { connect } = useConnect();
   if (pathname === "/auth/signin") return null;

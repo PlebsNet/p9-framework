@@ -22,7 +22,7 @@ export default async function ProfilePage() {
   const userId = session.user.id;
 
   // 2) Load user row (to get ethAddress) and assessments in parallel
-  const [user, assessments] = await Promise.all([
+  const [, assessments] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {

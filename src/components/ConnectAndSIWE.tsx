@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getCsrfToken, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
@@ -41,7 +41,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   };
 
   // Handle SIWE sign-in
-  const handleSignIn = async () => {
+  const handleSignIn = useCallback(async () => {
     try {
       setIsLoading(true);
       setError('');
@@ -113,7 +113,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
       setProcessingStep('');
       setShouldSignIn(false);
     }
-  };
+  }, [isConnected, address, signMessageAsync]);
 
   // Automatically trigger sign-in when wallet connection completes
   useEffect(() => {
@@ -126,7 +126,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isConnected, address, shouldSignIn]);
+  }, [isConnected, address, shouldSignIn, handleSignIn]);
 
   // Trigger the "connect wallet" flow, which will then trigger sign-in
   const handleConnectAndSignIn = () => {

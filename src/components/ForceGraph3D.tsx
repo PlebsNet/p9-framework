@@ -29,10 +29,20 @@ interface ForceGraph3DProps {
   showNavInfo?: boolean;
 }
 
-// @ts-expect-error ssr
-const ForceGraph3D = dynamic(() => import('react-force-graph').then(mod => mod.ForceGraph3D), {
-  ssr: false
-}) as React.ComponentType<ForceGraph3DProps>;
+// Dynamically import ForceGraph3D with A-Frame
+const ForceGraph3D = dynamic(
+  async () => {
+    // First import A-Frame
+    await import('aframe');
+    // Then import ForceGraph3D
+    const mod = await import('react-force-graph');
+    return mod.ForceGraph3D;
+  },
+  {
+    ssr: false,
+    loading: () => <div>Loading 3D Graph...</div>
+  }
+) as React.ComponentType<ForceGraph3DProps>;
 
 interface Node {
   id: string;
@@ -250,19 +260,29 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
           graphData={data}
           width={width}
           height={height}
-          nodeColor={() => '#7598F9'}
+          nodeColor={() => '#3b82f6'}
           nodeRelSize={6}
           nodeLabel="label"
-          linkColor={() => '#fff'}
-          linkWidth={5}
-          backgroundColor="#08090A"
-          onEngineStop={() => console.log('Engine stopped')}
+          linkColor={() => '#4b5563'}
+          linkWidth={1}
+          backgroundColor="#000000"
+          onEngineStop={() => {
+            if (fgRef.current) {
+              fgRef.current.cameraPosition({ z: 600 });
+            }
+          }}
           showNavInfo={false}
         />
       ) : (
-        <div className="h-full w-full bg-gray-950 border-1 border-gray-800 text-md text-gray-50 flex flex-col items-center justify-center p-4">
-            <p>No data available.</p>
-            <p>Please, initiate the test to create nodes and links.</p>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#4b5563',
+          textAlign: 'center'
+        }}>
+          No data available
         </div>
       )}
     </div>
