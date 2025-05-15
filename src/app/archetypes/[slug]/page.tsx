@@ -1,4 +1,6 @@
-import { Metadata } from "next";
+"use client"; 
+
+import { use } from "react"; 
 import Link from "next/link";
 import { archetypes } from "@/lib/archetypes";
 import { archetypeCentroids, Centroid } from "@/lib/archetypeCentroids";
@@ -6,23 +8,13 @@ import ArchetypeRadar from "@/components/ArchetypeRadar";
 import { ArchetypeAvatars } from "@/components/ArchetypeAvatars";
 import type { Dimension } from "@/lib/archetypeCentroids";
 
-interface ArchetypePageProps {
-  params: { slug: string };
-}
 
-export function generateMetadata({
-  params,
-}: ArchetypePageProps): Metadata {
-  const arch = archetypes.find((a) => a.slug === params.slug);
-  return {
-    title: arch ? `${arch.name} • P9 Archetypes` : "Archetype Not Found • P9",
-    description:
-      arch?.description || "Discover your P9 archetype profile and insights.",
-  };
-}
+type Params = Promise<{ slug: string }>;
 
-export default function ArchetypePage({ params }: ArchetypePageProps) {
-  const archetype = archetypes.find((a) => a.slug === params.slug);
+export default function Page({ params }: { params: Params }) {
+  const { slug } = use(params);
+  
+  const archetype = archetypes.find((a) => a.slug === slug);
   if (!archetype) {
     return (
       <main className="p-6 text-center">
@@ -73,7 +65,7 @@ export default function ArchetypePage({ params }: ArchetypePageProps) {
       <section aria-labelledby="psychometric-profile-heading" className="space-y-8">
         <h2 id="psychometric-profile-heading" className="text-2xl font-semibold">Psychometric Profile</h2>
         <p className="text-gray-700">{archetype.description}</p>
-        <div className="mt-2 text-sm text-zinc-600 space-y-1">
+        <div className="mt-2 text-sm text-gray-600 space-y-1">
           {archetype.cognitiveFrame && (
             <p>
               <span className="font-semibold">Cognitive frame:</span> {archetype.cognitiveFrame}

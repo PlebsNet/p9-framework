@@ -1,33 +1,41 @@
-"use client"; 
+"use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
-import AuthButton from '@/components/SignIn';
-import { Button } from '@/components/ui/Button';
+import { usePathname } from "next/navigation";
+import { useIsSignedIn } from "@/hooks/useIsSignedIn";
+import { useIsMobile } from '@/hooks/useIsMobile';
+import WalletConnect from '@/components/WalletConnect';
+
 import {
   Logomark,
   User,
   More,
+  Brain,
 } from '@/components/Icons';
 
+import { motion, AnimatePresence } from "framer-motion";
+
 export default function Navigation() {
+  const isSignedIn = useIsSignedIn();
+  const isMobile = useIsMobile();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const signInPage = pathname === "/auth/signin";
+
   return (
     <>
-      <header className='flex items-center justify-space-between p-4 mb-12 w-fullitems-center backdrop-blur-lg bg-zinc-900/50 flex flex-col text-base h-full left-0 leading-relaxed min-h-screen fixed top-0 w-[76px]'>
-        <Link href='/' className="flex justify-center h-8 w-8 leading-relaxed">
-          <Logomark />
-        </Link>
-
-        <nav>
-          <Link href='/profile' className="flex justify-center h-8 w-8 leading-relaxed">
-            <User />
+      <header className="z-999 w-full flex items-center justify-between px-8 py-4">
+        {!signInPage &&(
+          <Link href="/" className="group rounded-lg p-2 flex items-center justify-center">
+            <Logomark className="h-9 w-9 group-hover:text-brand-500" />
           </Link>
+        )}
 
-          <Button variant="ghost" size="icon">
-            <More />
-          </Button>
+        <nav className="absolute right-8 flex flex-col items-center gap-6 text-xl">
+          <WalletConnect />
         </nav>
       </header>
-      <AuthButton />
     </>
   );
-};
+}

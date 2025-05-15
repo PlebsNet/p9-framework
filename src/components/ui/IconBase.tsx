@@ -10,7 +10,7 @@ export type IconBaseProps = Omit<SVGProps<SVGSVGElement>, 'children'> & {
 const defaultAttrs = {
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 2 as number,
+  strokeWidth: 1.5 as number,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
 };

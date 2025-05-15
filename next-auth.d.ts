@@ -9,6 +9,7 @@ declare module "next-auth" {
     user: DefaultSession["user"] & {
       id: string;
       role: "USER" | "ADMIN";
+      ethAddress?: string;
     };
   }
 
@@ -18,5 +19,6 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     /** Persisted in your Prisma schema */
     role: "USER" | "ADMIN";
+    ethAddress?: string;
   }
 }

@@ -42,7 +42,7 @@ export default function ArchetypeRadar({
   // Hydration guard for tooltip
   const [mounted, setMounted] = useState(false);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | undefined>();
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: { chartX?: number; chartY?: number } | undefined) => {
     if (e && typeof e.chartX === "number" && typeof e.chartY === "number") {
       setTooltipPos({ x: e.chartX, y: e.chartY });
     }
@@ -124,9 +124,14 @@ export default function ArchetypeRadar({
             fontSize: "1rem",
           }}
           labelFormatter={() => name}
-          formatter={(value, key, props) => {
+          formatter={(
+            value: number | string,
+            key: string,
+            props: { payload?: { dimension?: string } }
+          ) => {
             const dim = props?.payload?.dimension ?? key;
-            return [`${value}`, `${dim}`];
+            const val = typeof value === "number" ? value : parseFloat(value as string);
+            return [`${val.toFixed(1)}%`, `${dim}`];
           }}
         />
       )}

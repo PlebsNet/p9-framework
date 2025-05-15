@@ -2,10 +2,15 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/react';
 import { meta } from '@/config/constants';
 import { Providers } from "./providers";
-import { inter, commitmono } from "@/fonts";
+import { Onest, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin-ext"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(meta.url),
@@ -56,13 +61,13 @@ export const metadata: Metadata = {
       url: '/site.webmanifest',
     },
   },
-}
+};
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: meta.themeColor,
-}
+};
 
 export default function RootLayout({
   children,
@@ -71,7 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${commitmono.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased bg-neutral-950 min-h-screen`}>
         <Providers>
           <Navigation />
           <main>

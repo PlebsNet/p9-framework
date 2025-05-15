@@ -1,34 +1,35 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold touch-manipulation transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "group cursor-pointer inline-flex items-center justify-center gap-1 whitespace-nowrap leading-none font-medium touch-manipulation transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-zinc-100 text-zinc-900 shadow hover:bg-zinc-100/90",
+          "bg-gray-100 text-gray-900 shadow hover:bg-gray-100/90 hover:text-gray-950",
         secondary:
-          "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800/80",
+          "bg-gray-800 text-gray-100 shadow-sm hover:bg-gray-800/80 hover:text-gray-50",
         positive:
-          "bg-emerald-500 text-zinc-100 shadow-sm hover:bg-emerald-500/90",
+          "bg-emerald-500 text-gray-50 shadow-sm hover:bg-emerald-500/90",
         destructive:
-          "bg-rose-500 text-zinc-100 shadow-sm hover:bg-rose-500/90",
+          "bg-rose-500 text-gray-50 shadow-sm hover:bg-rose-500/90",
         outline:
-          "border bg-transparent hover:shadow-sm hover:bg-zinc-100/90 hover:text-zinc-900",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-gray-800 bg-transparent hover:shadow-sm hover:bg-gray-800/90 hover:text-gray-50",
+        ghost:
+          "hover:bg-gray-800/90 hover:text-gray-50",
+        link:
+          "text-[var(--color-brand-500)] hover:text-gray-50 underline-offset-4 hover:underline",
       },
       size: {
-        xs: "px-3 py-1 rounded-sm text-xs",
-        sm: "px-3 py-2 rounded-md text-xs",
-        md: "h-[34px] px-4 py-2 text-md rounded-[10px]",
-        lg: "h-10 px-8 rounded-lg text-lg",
-        xl: "px-10 py-4 rounded-lg text-lg",
-        icon: "h-9 w-9",
+        xs: "px-1.5 py-0.25 rounded-md gap-1 text-xs",
+        sm: "px-2.5 py-0.75 font-semibold rounded-md gap-1 text-xs",
+        md: "px-3 py-1.5 rounded-[10px] text-sm",
+        lg: "px-4.5 py-1.5 rounded-xl text-md",
+        xl: "px-5 py-2 rounded-xl text-lg",
+        icon: "px-4 py-3 rounded-[10px] h-auto min-w-9 aspect-square",
       },
     },
     defaultVariants: {

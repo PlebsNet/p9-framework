@@ -3,12 +3,12 @@ import localFont from 'next/font/local';
 export const inter = localFont({
   src: [
     {
-      path: '../fonts/InterRegular-Variable.woff2',
+      path: './InterRegular-Variable.woff2',
       weight: '100 900',
       style: 'normal',
     },
     {
-      path: '../fonts/InterItalic-Variable.woff2',
+      path: './InterItalic-Variable.woff2',
       weight: '100 900',
       style: 'italic',
     },
@@ -20,7 +20,7 @@ export const inter = localFont({
 export const commitmono = localFont({
   src: [
     {
-      path: '../fonts/CommitMono-Variable.woff2',
+      path: './CommitMono-Variable.woff2',
       weight: '200 700',
       style: 'normal',
     },

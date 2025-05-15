@@ -45,3 +45,6 @@ next-env.d.ts
 prisma/*
 !schema.prisma
 !seed.js
+
+# vscode
+.vscode/*

@@ -38,7 +38,7 @@ function initBuckets(): Record<Dimension, number[]> {
       )
     )
   ) as Dimension[];
-  const buckets: Record<Dimension, number[]> = {} as any;
+  const buckets: Record<Dimension, number[]> = {} as Record<Dimension, number[]>;
   dims.forEach(dim => { buckets[dim] = []; });
   return buckets;
 };
@@ -54,7 +54,7 @@ function groupByDimension(answers: Answers) {
     let raw = answers[q.id] ?? 4;
     if (q.reverse) raw = 8 - raw;
     const value = mapLikert(raw);
-    const weight = typeof (q as any).weight === "number" ? (q as any).weight : 1.0;
+    const weight = (q as { weight?: number }).weight ?? 1.0;
     for (const dim of dims) {
       if (!buckets[dim]) continue;
       buckets[dim].push(value * weight);
@@ -67,7 +67,7 @@ export function computeDimensionAverages(
   answers: Answers
 ): Record<Dimension, number> {
   const grouped = groupByDimension(answers);
-  const avgs: Record<Dimension, number> = {} as any;
+  const avgs: Record<Dimension, number> = {} as Record<Dimension, number>;
   for (const dim in grouped) {
     const vals = grouped[dim as Dimension];
     avgs[dim as Dimension] = vals.length
@@ -126,7 +126,7 @@ export function computeArchetypeScores(
     // Find archetype's primaryTraits
     const archetype = archetypes.find(a => a.slug === slug);
     const matchBoost =
-      archetype?.primaryTraits?.filter(t => topTraits.includes(t)).length ?? 0;
+      archetype?.primaryTraits?.filter(t => topTraits.includes(t as Dimension)).length ?? 0;
     const traitBoost = matchBoost * 0.05; // Each trait match adds 5%
     scores[slug] = Math.min(baseScore + traitBoost, 1);
   });

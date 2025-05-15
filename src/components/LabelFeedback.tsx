@@ -25,8 +25,9 @@ const LabelFeedback: React.FC<LabelFeedbackProps> = ({ label }) => {
         throw new Error(`Server responded with status ${res.status}`);
       }
       setSubmitted(true);
-    } catch (err: any) {
-      console.error("Feedback submission error:", err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong.";
+      console.error("Feedback submission error:", message);
       setError("Sorry, something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

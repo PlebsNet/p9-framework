@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 const ReassessmentBanner: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [due, setDue] = useState(false);
 
   useEffect(() => {

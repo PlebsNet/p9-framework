@@ -1,12 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 
-declare global {
-  // Prevent multiple instances of Prisma Client in development
-  // https://www.prisma.io/docs/support/help-articles/nextjs-prisma-client-dev-practices
-  var prisma: PrismaClient | undefined;
-}
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient;
+};
 
-const prisma = global.prisma || new PrismaClient({
+const prisma = globalForPrisma.prisma || new PrismaClient({
   // Enable detailed logging in development
   log:
     process.env.NODE_ENV === "development"
@@ -15,7 +13,7 @@ const prisma = global.prisma || new PrismaClient({
 });
 
 if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
+  globalForPrisma.prisma = prisma;
 }
 
 // Optional: gracefully close Prisma on process termination

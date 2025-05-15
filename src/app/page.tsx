@@ -1,38 +1,89 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { ArchetypeGrid } from "@/components/ArchetypeGrid";
-import { BgHome } from "@/components/Backgrounds";
+import { archetypes } from "@/lib/archetypes";
+import { Button } from "@/components/ui/Button";
+import { ChevronRight } from "@/components/Icons";
+import { Header, HeaderTitle, HeaderSubtitle, HeaderDescription } from "@/components/ui/Header";
+import { ArchetypeGallery } from "@/components/ArchetypeGallery";
+import { useContainerSize } from '@/hooks/useContainerSize';
+import DynamicGraph from '@/components/ForceGraph3D';
 
 export default function Home() {
+  const { containerRef, dimensions } = useContainerSize();
+
   return (
     <>
-      <BgHome className="w-500 opacity-50 top-0 r-0"/>
-      <div className="flex flex-col items-center justify-center gap-12">
-        <h2 className="flex flex-col items-center justify-center gap-2 text-[48px] leading-[72px]">
-          Discover Your P9 Archetype
-        </h2>
-        <p>Scientific. Adaptive. Community-driven personality insights—powered by AI.</p>
-        <Link
-          href="/assessment"
-          className="cursor-pointer overflow-hidden relative flex flex-row items-end justify-between gap-2 aspect-[9/3.5] w-[206px] p-3 rounded-md text-sm text-[var(--background)] bg-[var(--brand)] after:content-[''] after:absolute after:inset-0 after:bg-[var(--brand)] after:[image-rendering:pixelated] after:bg-[url('/crystal.webp')] after:bg-no-repeat after:bg-center after:[object-fit:50%] after:[filter:url('/duotone.svg#crystal')] after:opacity-0 after:transition-opacity after:duration-150 after:ease-in-out hover:after:opacity-100"
-        >
-          <span className="z-1">Take the P9 Assessment</span>
-          <svg className="z-1" width="1.5em" height="1.5em" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 12h12.5m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-        </Link>
-        <Link
-          href="/assessment"
-          className="cursor-pointer overflow-hidden relative flex flex-row items-end justify-between gap-2 aspect-[9/3.5] w-[206px] p-3 rounded-md text-sm text-[var(--foreground)] bg-[var(--background)] hover:after:opacity-100"
-        >
-          <span className="z-1">Explore Archetypes</span>
-          <svg className="z-1" width="1.5em" height="1.5em" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 12h12.5m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-        </Link>
-      </div>
+      <section className="flex flex-col items-center justify-center my-40">
+        <Header>
+          <HeaderSubtitle>
+            Introducing Plebs
+          </HeaderSubtitle>
+          <HeaderTitle>
+            Discover the P in Personality
+          </HeaderTitle>
+          <HeaderDescription>
+            Scientific. Adaptive. Community-driven personality insights—powered by AI.
+          </HeaderDescription>
+        </Header>
+          <div className="flex gap-4">
+            <Button asChild size="lg">
+              <Link href="/assessment">
+                <span className="z-1">Take the Assessment</span>
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="lg">
+              <Link href="/archetypes">
+                <span className="z-1 gradient-text">Explore the Archetypes</span>
+                <ChevronRight className="transition-transform duration-200 ease-out group-hover:translate-x-2" />
+              </Link>
+            </Button>
+          </div>
+      </section>
 
-      <div
-        className="grid items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]"
-      >
-        <ArchetypeGrid />
-      </div>
+      <section className="flex flex-col items-center justify-center gap-12 my-40">
+        <Header>
+          {/* <HeaderSubtitle>
+            Introducing Plebs
+          </HeaderSubtitle> */}
+          <HeaderTitle>
+            Meet the Archetypes
+          </HeaderTitle>
+          <HeaderDescription>
+            There are 9 archetypes under 3 clusters.
+          </HeaderDescription>
+        </Header>
+    
+        <ArchetypeGallery archetypes={archetypes} />
+      </section>
+
+      <section className="flex flex-col items-center justify-center gap-12 my-40">
+        <Header>
+          {/* <HeaderSubtitle>
+            Introducing Plebs
+          </HeaderSubtitle> */}
+          <HeaderTitle>
+            Meet the Archetypes
+          </HeaderTitle>
+          <HeaderDescription>
+            There are 9 archetypes under 3 clusters.
+          </HeaderDescription>
+        </Header>
+
+        <div
+          ref={containerRef}
+          style={{
+            width: '100%',
+            height: '100vh',
+            position: 'relative'
+          }}
+        >
+          <DynamicGraph
+            width={dimensions.width}
+            height={dimensions.height}
+          />
+        </div>
+      </section>
     </>
   );
 }

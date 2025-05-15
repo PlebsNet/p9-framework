@@ -1,10 +1,11 @@
 import { memo, forwardRef, SVGProps } from 'react';
 import { IconBase } from '@/components/ui/IconBase';
+import { cn } from '@/lib/utils';
 
-export function Logomark(props: SVGProps<SVGSVGElement>) {
+export function Logomark({ className = "", ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      className="logomark darkmode"
+      className={cn("logomark darkmode", className)}
       width="100%"
       height="100%"
       viewBox="0 0 189 256"
@@ -44,7 +45,7 @@ export const User = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>
 
 export const More = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
   <IconBase ref={ref} aria-label="More icon" {...props}>
-    <line x1="4" x2="20" y1="8" y2="8" />
+    <line x1="4" x2="20" y1="9" y2="9" />
     <line x1="4" x2="14" y1="16" y2="16" />
   </IconBase>
 )));

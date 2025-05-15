@@ -124,8 +124,9 @@ export async function POST(request: Request) {
       success: true,
       alreadySaved: false
     });
-  } catch (err: any) {
-    console.error("Error saving results:", err);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Error saving results:", message);
     return NextResponse.json(
       { error: "Failed to save results" },
       { status: 500 }

@@ -16,9 +16,9 @@ export type ArchetypeSlug =
 
 // Cluster colors (as literal)
 const CLUSTER_COLOR = {
-  explorer: "#14B8A6",
-  executor: "#FBBF24",
-  enabler: "#8B5CF6",
+  explorer: "#65E2E2",
+  executor: "#E2B865",
+  enabler: "#E265E2",
 } as const;
 
 // Assign each archetype to a cluster

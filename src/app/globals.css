@@ -1,15 +1,151 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-brand-50: #F5F8FE;
+  --color-brand-100: #E3ECFD;
+  --color-brand-200: #C9D9FB;
+  --color-brand-300: #A7C1F9;
+  --color-brand-400: #8AAAF7;
+  --color-brand-500: #7598F9;
+  --color-brand-600: #4F7AF4;
+  --color-brand-700: #3561DC;
+  --color-brand-800: #2B4DB2;
+  --color-brand-900: #233F8E;
+  --color-brand-950: #172858;
+
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F0F1F2;
+  --color-gray-200: #E1E3E6;
+  --color-gray-300: #C8CBD0;
+  --color-gray-400: #A5AAB1;
+  --color-gray-500: #7D828A;
+  --color-gray-600: #5A5F66;
+  --color-gray-700: #3C3F45;
+  --color-gray-800: #232529;
+  --color-gray-900: #121314;
+  --color-gray-950: #08090A;
+
+  --color-slate-50: #f8f9fb;
+  --color-slate-100: #e5e7eb;
+  --color-slate-200: #d1d5db;
+  --color-slate-300: #9ca3af;
+  --color-slate-400: #6b7280;
+  --color-slate-500: #4b5563;
+  --color-slate-600: #374151;
+  --color-slate-700: #262b37;
+  --color-slate-800: #1e2025;
+  --color-slate-900: #141519;
+  --color-slate-950: #0c0d10;
+
+  --color-teal-50: #F2FCFC;
+  --color-teal-100: #D9F7F7;
+  --color-teal-200: #B8F0F0;
+  --color-teal-300: #91E8E8;
+  --color-teal-400: #77E4E4;
+  --color-teal-500: #65E2E2;
+  --color-teal-600: #3DC9C9;
+  --color-teal-700: #27A7A7;
+  --color-teal-800: #208282;
+  --color-teal-900: #1D6666;
+  --color-teal-950: #103737;
+
+  --color-amber-50: #FFFBEB;
+  --color-amber-100: #FDF0C5;
+  --color-amber-200: #F8DC90;
+  --color-amber-300: #F1C860;
+  --color-amber-400: #EBC04F;
+  --color-amber-500: #E2B865;
+  --color-amber-600: #C69E50;
+  --color-amber-700: #A38340;
+  --color-amber-800: #826732;
+  --color-amber-900: #685328;
+  --color-amber-950: #3B3016;
+
+  --color-magenta-50: #FCF2FC;
+  --color-magenta-100: #F7D9F7;
+  --color-magenta-200: #F0B8F0;
+  --color-magenta-300: #E88FE8;
+  --color-magenta-400: #E571E5;
+  --color-magenta-500: #E265E2;
+  --color-magenta-600: #C945C9;
+  --color-magenta-700: #A936A9;
+  --color-magenta-800: #892B89;
+  --color-magenta-900: #6D236D;
+  --color-magenta-950: #3C103C;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-50: #F5F8FE;
+  --color-brand-100: #E3ECFD;
+  --color-brand-200: #C9D9FB;
+  --color-brand-300: #A7C1F9;
+  --color-brand-400: #8AAAF7;
+  --color-brand-500: #7598F9;
+  --color-brand-600: #4F7AF4;
+  --color-brand-700: #3561DC;
+  --color-brand-800: #2B4DB2;
+  --color-brand-900: #233F8E;
+  --color-brand-950: #172858;
+
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F0F1F2;
+  --color-gray-200: #E1E3E6;
+  --color-gray-300: #C8CBD0;
+  --color-gray-400: #A5AAB1;
+  --color-gray-500: #7D828A;
+  --color-gray-600: #5A5F66;
+  --color-gray-700: #3C3F45;
+  --color-gray-800: #232529;
+  --color-gray-900: #121314;
+  --color-gray-950: #08090A;
+
+  --color-slate-50: #f8f9fb;
+  --color-slate-100: #e5e7eb;
+  --color-slate-200: #d1d5db;
+  --color-slate-300: #9ca3af;
+  --color-slate-400: #6b7280;
+  --color-slate-500: #4b5563;
+  --color-slate-600: #374151;
+  --color-slate-700: #262b37;
+  --color-slate-800: #1e2025;
+  --color-slate-900: #141519;
+  --color-slate-950: #0c0d10;
+
+  --color-teal-50: #F2FCFC;
+  --color-teal-100: #D9F7F7;
+  --color-teal-200: #B8F0F0;
+  --color-teal-300: #91E8E8;
+  --color-teal-400: #77E4E4;
+  --color-teal-500: #65E2E2;
+  --color-teal-600: #3DC9C9;
+  --color-teal-700: #27A7A7;
+  --color-teal-800: #208282;
+  --color-teal-900: #1D6666;
+  --color-teal-950: #103737;
+
+  --color-amber-50: #FFFBEB;
+  --color-amber-100: #FDF0C5;
+  --color-amber-200: #F8DC90;
+  --color-amber-300: #F1C860;
+  --color-amber-400: #EBC04F;
+  --color-amber-500: #E2B865;
+  --color-amber-600: #C69E50;
+  --color-amber-700: #A38340;
+  --color-amber-800: #826732;
+  --color-amber-900: #685328;
+  --color-amber-950: #3B3016;
+
+  --color-magenta-50: #FCF2FC;
+  --color-magenta-100: #F7D9F7;
+  --color-magenta-200: #F0B8F0;
+  --color-magenta-300: #E88FE8;
+  --color-magenta-400: #E571E5;
+  --color-magenta-500: #E265E2;
+  --color-magenta-600: #C945C9;
+  --color-magenta-700: #A936A9;
+  --color-magenta-800: #892B89;
+  --color-magenta-900: #6D236D;
+  --color-magenta-950: #3C103C;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -24,16 +160,19 @@
 *::after {
   box-sizing: border-box;
 }
+
 html {
   font-size: 16px;
 }
+
 body {
   display: flex;
   flex-direction: column;
   margin: 0;
   padding: 0;
-  background-color: rgb(16 16 18);
-  color: rgb(159 159 169);
+  background-color: #08090A;
+  font-family: var(--font-inter);
+  color: var(--color-gray-400);
   min-height: 100vh;
   line-height: 21px;
   overflow-y: visible;
@@ -41,13 +180,90 @@ body {
   text-rendering: optimizelegibility;
   text-wrap-mode: wrap;
   text-wrap-style: balance;
+  font-size: 16px;
+  font-variation-settings: normal;
+  font-weight: 400;
+  height: 217px;
+  line-height: 24px;
 }
 
 main {
   width: 100%;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #fff;
+/*
+ *  Loading compound transition utility for shapes
+*/
+
+.clip-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
+.shape-transition {
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+  will-change: opacity, transform;
+}
+
+/*
+ *  Background and title gradients
+*/
+
+.gradient-bg::before {
+  pointer-events: none;
+  z-index: -1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-image:
+    radial-gradient(
+      rgb(252 120 64 / .1),
+      rgb(252 120 64 / .02) 30%,
+      transparent 50%),
+    radial-gradient(
+      rgb(94 106 210 / .15),
+      rgb(5 106 210 / .025) 30%,
+      transparent 50%);
+  background-size:
+    1400px 1400px,
+    980px 720px;
+  background-position:
+    50% 100%,
+    50% -50%;
+}
+
+.gradient-text {
+  color: var(--color-gray-400);
+  background-color: var(--color-gray-400);
+  background:
+    linear-gradient(
+      to right,
+      var(--color-gray-400),
+      var(--color-gray-50),
+      var(--color-gray-400)
+    );  
+  background-size: 200%;
+  animation: gradientMotion 9s linear infinite;
+}
+
+@supports ((-webkit-background-clip: text) and (-webkit-text-fill-color: transparent)) {
+  .gradient-text {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+    
+@supports ((background-clip: text) and (text-fill-color: transparent)) {
+  .gradient-text {
+    background-clip: text;
+    text-fill-color: transparent;
+  }
+}
+
+@keyframes gradientMotion {
+  from { background-position: 0% center }
+  to { background-position: -200% center }
+}
