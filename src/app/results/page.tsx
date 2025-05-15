@@ -25,7 +25,7 @@ type ProfileItemWithExtras = ProfileItem & {
 };
 
 // Must match STORAGE_ANS from the assessment page
-const STORAGE_ANS = "p9_answers";
+const STORAGE_ANS = "plebs_answers";
 
 export default function ResultsPage() {
   const router = useRouter();

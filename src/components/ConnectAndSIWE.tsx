@@ -4,7 +4,12 @@ import { SiweMessage } from 'siwe';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { cbWalletConnector } from "@/lib/wagmiConfig";
 
-export const ConnectAndSIWE = () => {
+interface ConnectAndSIWEProps {
+  onConnectChange?: (connected: boolean) => void;
+  onVerified?: (address: string) => void;
+}
+
+export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [processingStep, setProcessingStep] = useState('');

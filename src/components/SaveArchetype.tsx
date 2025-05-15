@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { computeProfile } from "@/lib/scoring";
 
-const STORAGE_ANS = "p9_answers";
-const STORAGE_IDX = "p9_currentIndex";
-const STORAGE_TEST = "p9_testId";
+const STORAGE_ANS = "plebs_answers";
+const STORAGE_IDX = "plebs_currentIndex";
+const STORAGE_TEST = "plebs_testId";
 
 export function SaveArchetype() {
   const { data: session, status } = useSession();
