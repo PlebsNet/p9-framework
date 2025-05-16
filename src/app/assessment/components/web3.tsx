@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -12,6 +11,8 @@ import DynamicGraph from "@/components/ForceGraph3D";
 import { useContainerSize } from '@/hooks/useContainerSize';
 import { useAccount, useChainId } from 'wagmi';
 import { useDepositTriple } from '@/hooks/useDepositTriple';
+import { useBatchDepositTriple } from '@/hooks/useBatchDepositTriple';
+import { useVerifyAttestor } from '@/hooks/useVerifyAttestor';
 import { MULTIVAULT_CONTRACT_ADDRESS, BLOCK_EXPLORER_URL } from '@/config/blockchain';
 import { parseUnits } from 'viem';
 import { Abi } from 'viem';
@@ -45,6 +46,8 @@ export default function Web3Assessment() {
         writeContractAsync,
         onReceipt
     } = useDepositTriple(MULTIVAULT_CONTRACT_ADDRESS);
+    const { batchDepositTriple } = useBatchDepositTriple();
+    const { verifyAndApproveAttestor, isApproved, isCheckingApproval } = useVerifyAttestor();
 
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -53,60 +56,141 @@ export default function Web3Assessment() {
     const [transactionStatuses, setTransactionStatuses] = useState<Record<string, TransactionStatus>>({});
     const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
     const [isProcessingQueue, setIsProcessingQueue] = useState(false);
+    const [isAttestorVerified, setIsAttestorVerified] = useState(false);
+
+    // Verify attestor on mount
+    useEffect(() => {
+        let isMounted = true;
+
+        const verifyAttestor = async () => {
+            if (!address || isAttestorVerified) return;
+            try {
+                const verified = await verifyAndApproveAttestor();
+                if (isMounted && typeof verified === 'boolean') {
+                    setIsAttestorVerified(verified);
+                }
+            } catch (error) {
+                console.error('Error verifying attestor:', error);
+                if (isMounted) {
+                    setFormError('Failed to verify attestor. Please try again.');
+                }
+            }
+        };
+
+        verifyAttestor();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [address, verifyAndApproveAttestor, isAttestorVerified]);
 
     // Process transaction queue
     useEffect(() => {
+        let isMounted = true;
+
         const processQueue = async () => {
-            if (isProcessingQueue || pendingTransactions.length === 0 || !address) return;
+            if (isProcessingQueue || pendingTransactions.length === 0 || !address || !isAttestorVerified) return;
 
             setIsProcessingQueue(true);
-            const currentTx = pendingTransactions[0];
+            const transactionsToProcess = [...pendingTransactions];
 
             try {
-                const hash = await writeContractAsync({
-                    address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
-                    abi: multivaultAbi as Abi,
-                    functionName: 'depositTriple',
-                    args: [address as `0x${string}`, BigInt(currentTx.tripleId)],
-                    value: parseUnits('0.001', 18),
-                    chain: baseSepolia
-                });
+                // If we have multiple pending transactions, use batch deposit
+                if (transactionsToProcess.length > 1) {
+                    const ids = transactionsToProcess.map(tx => BigInt(tx.tripleId));
+                    const values = transactionsToProcess.map(() => parseUnits('0.001', 18));
 
-                setTransactionStatuses(prev => ({
-                    ...prev,
-                    [currentTx.questionId]: {
-                        questionId: currentTx.questionId,
-                        status: 'success',
-                        txHash: hash
-                    }
-                }));
+                    const hash = await batchDepositTriple({
+                        receiver: address as `0x${string}`,
+                        ids,
+                        values,
+                        attestorAddress: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`
+                    });
 
-                onReceipt((receipt) => {
-                    console.log('Transaction confirmed:', receipt);
-                });
-            } catch (err) {
-                setTransactionStatuses(prev => ({
-                    ...prev,
-                    [currentTx.questionId]: {
-                        questionId: currentTx.questionId,
-                        status: 'error'
+                    if (isMounted) {
+                        // Update all statuses at once
+                        const newStatuses = transactionsToProcess.reduce((acc, tx) => ({
+                            ...acc,
+                            [tx.questionId]: {
+                                questionId: tx.questionId,
+                                status: 'success',
+                                txHash: hash
+                            }
+                        }), {});
+
+                        setTransactionStatuses(prev => ({
+                            ...prev,
+                            ...newStatuses
+                        }));
+                        setPendingTransactions([]);
                     }
-                }));
-                console.error('Error depositing triple:', err);
-                if (err instanceof Error) {
-                    setFormError(`Error: ${err.message}${err.cause ? ` (Cause: ${JSON.stringify(err.cause)})` : ''}`);
                 } else {
-                    setFormError(`An unknown error occurred: ${JSON.stringify(err)}`);
+                    // Single transaction - use regular deposit
+                    const currentTx = transactionsToProcess[0];
+                    const hash = await writeContractAsync({
+                        address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
+                        abi: multivaultAbi as Abi,
+                        functionName: 'depositTriple',
+                        args: [address as `0x${string}`, BigInt(currentTx.tripleId)],
+                        value: parseUnits('0.001', 18),
+                        chain: baseSepolia
+                    });
+
+                    if (isMounted) {
+                        setTransactionStatuses(prev => ({
+                            ...prev,
+                            [currentTx.questionId]: {
+                                questionId: currentTx.questionId,
+                                status: 'success',
+                                txHash: hash
+                            }
+                        }));
+                        setPendingTransactions(prev => prev.slice(1));
+                    }
+                }
+
+                if (isMounted) {
+                    onReceipt((receipt) => {
+                        console.log('Transaction confirmed:', receipt);
+                    });
+                }
+            } catch (err) {
+                if (isMounted) {
+                    // Handle errors for all affected transactions
+                    const newStatuses = transactionsToProcess.reduce((acc, tx) => ({
+                        ...acc,
+                        [tx.questionId]: {
+                            questionId: tx.questionId,
+                            status: 'error'
+                        }
+                    }), {});
+
+                    setTransactionStatuses(prev => ({
+                        ...prev,
+                        ...newStatuses
+                    }));
+                    setPendingTransactions([]);
+
+                    console.error('Error depositing triple:', err);
+                    if (err instanceof Error) {
+                        setFormError(`Error: ${err.message}${err.cause ? ` (Cause: ${JSON.stringify(err.cause)})` : ''}`);
+                    } else {
+                        setFormError(`An unknown error occurred: ${JSON.stringify(err)}`);
+                    }
                 }
             }
 
-            // Remove processed transaction from queue
-            setPendingTransactions(prev => prev.slice(1));
-            setIsProcessingQueue(false);
+            if (isMounted) {
+                setIsProcessingQueue(false);
+            }
         };
 
         processQueue();
-    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt]);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt, batchDepositTriple, isAttestorVerified]);
 
     // Hydrate once on mount (fire-and-forget)
     useEffect(() => {
@@ -227,13 +311,39 @@ export default function Web3Assessment() {
                 </div>
             )}
 
+            {isCheckingApproval && (
+                <div className="mb-4 p-3 bg-blue-900/30 border border-blue-700 rounded-md text-blue-500 text-sm">
+                    <p>Verifying attestor permissions...</p>
+                </div>
+            )}
+
+            {!isAttestorVerified && !isCheckingApproval && (
+                <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-md text-red-500 text-sm">
+                    <p className="font-bold">Attestor Verification Required</p>
+                    <p>To continue with the assessment, you need to approve the attestor contract.</p>
+                    <p className="mt-2">A wallet popup will appear asking for your approval. This is required to:</p>
+                    <ul className="list-disc list-inside mt-1 ml-2">
+                        <li>Verify your answers on-chain</li>
+                        <li>Ensure the integrity of your assessment</li>
+                        <li>Allow the contract to interact with your wallet</li>
+                    </ul>
+                    <button
+                        type="button"
+                        onClick={() => verifyAndApproveAttestor()}
+                        className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                    >
+                        Approve Attestor
+                    </button>
+                </div>
+            )}
+
             <div className="flex justify-between items-center mb-6">
                 <p className="text-sm text-gray-600" aria-live="polite">
                     Question {currentIndex + 1} of {total}
                 </p>
                 <button
                     type="submit"
-                    disabled={!allAnswered || isSubmitting || !address}
+                    disabled={!allAnswered || isSubmitting || !address || !isAttestorVerified}
                     className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-gray-300 disabled:text-gray-600 transition-opacity"
                 >
                     {isSubmitting ? "Submitting..." : "Submit Answers"}

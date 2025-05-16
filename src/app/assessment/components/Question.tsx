@@ -32,8 +32,16 @@ export default function Question({
   isSuccess,
   explorerButton,
 }: QuestionProps) {
-  // Treat 0 as "no selection"
-  const selected = value > 0 ? String(value) : undefined;
+  // Memoize the selected value to prevent unnecessary re-renders
+  const selected = React.useMemo(() =>
+    value > 0 ? String(value) : undefined,
+    [value]
+  );
+
+  // Memoize the change handler to prevent unnecessary re-renders
+  const handleValueChange = React.useCallback((val: string) => {
+    onChange(id, Number(val));
+  }, [id, onChange]);
 
   return (
     <div className="mb-8">
@@ -48,7 +56,7 @@ export default function Question({
         <RadioGroup
           name={id}
           value={selected}
-          onValueChange={(val) => onChange(id, Number(val))}
+          onValueChange={handleValueChange}
           className="grid grid-cols-7 gap-2"
           required
           aria-labelledby={`${id}-legend`}
