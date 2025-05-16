@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
-import { useIsSignedIn } from "@/hooks/useIsSignedIn";
-import { useIsMobile } from '@/hooks/useIsMobile';
 import WalletConnect from '@/components/WalletConnect';
 import { motion, AnimatePresence } from "framer-motion";
 import { Dot, Logomark } from '@/components/Icons';
@@ -59,9 +56,6 @@ const menuContent = {
 }
 
 export default function Navigation() {
-  const isSignedIn = useIsSignedIn();
-  const isMobile = useIsMobile();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const [isActive, setIsActive] = useState(false);
   if (pathname === "/auth/signin") return null;
