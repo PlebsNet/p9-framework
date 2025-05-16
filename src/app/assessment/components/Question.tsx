@@ -10,6 +10,7 @@ export interface QuestionProps {
   onChange: (id: string, value: number) => void;
   isLoading?: boolean;
   isSuccess?: boolean;
+  isAnswered?: boolean;
   explorerButton?: React.ReactNode;
 }
 
@@ -28,8 +29,9 @@ export default function Question({
   text,
   value,
   onChange,
-  isLoading,
-  isSuccess,
+  isLoading = false,
+  isSuccess = false,
+  isAnswered = false,
   explorerButton,
 }: QuestionProps) {
   // Treat 0 as "no selection"
