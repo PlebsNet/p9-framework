@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Logomark } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { ConnectAndSIWE } from "@/components/ConnectAndSIWE";
-
+import { Separator } from "@/components/ui/Separator";
 
 export default function SignInPage() {
   const { data: session, status } = useSession();
@@ -69,27 +69,32 @@ export default function SignInPage() {
         </Link>
 
         <h2 className="text-lg font-medium mb-6 text-gray-500">
-          Sign in to Plebs
+          Connect to Plebs
         </h2>
 
-        {Object.values(providers).map((prov) => (
-          <Button
-            size="lg"
-            key={prov.id}
-            onClick={() => signIn(prov.id, { callbackUrl })}
-            className="mb-3 w-full"
-          >
-            Sign in with {prov.name}
-          </Button>
-        ))}
+        <div className="flex flex-col gap-4 w-72">
+          <ConnectAndSIWE
+            onVerified={handleWalletVerified}
+            onConnectChange={(connected) => {
+              // This can be used for UI feedback
+            }}
+          />
 
-        {/* Wallet connector with SIWE */}
-        <ConnectAndSIWE
-          onVerified={handleWalletVerified}
-          onConnectChange={(connected) => {
-            // This can be used for UI feedback
-          }}
-        />
+          <Separator className="mt-4"/>
+
+          <p className="text-sm text-center text-gray-600">Or continue with email</p>
+          {Object.values(providers).map((prov) => (
+            <Button
+              size="xl"
+              variant="secondary"
+              key={prov.id}
+              onClick={() => signIn(prov.id, { callbackUrl })}
+              className="w-full text-md"
+            >
+              Sign in with {prov.name}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );

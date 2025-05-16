@@ -147,18 +147,20 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
       {!isConnected ? (
         // Not connected - show the connect button
         <Button
+          size="lg"
           onClick={handleConnectAndSignIn}
           disabled={isLoading}
-          className="mb-3 w-full"
+          className="w-full text-md bg-[#0052ff] text-gray-50"
         >
           {isLoading ? 'Connecting...' : 'Connect with Base'}
         </Button>
       ) : (
         // Already connected - show fallback sign in button for Next Auth
         <Button
+          size="xl"
           onClick={handleSignIn}
           disabled={isLoading}
-          className="mb-3 w-full"
+            className="w-full text-md bg-[#0052ff] text-gray-50"
         >
           {isLoading ? 'Signing in...' : 'Sign in with Base'}
         </Button>
@@ -170,11 +172,11 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
         </div>
       )}
 
-      {isConnected && address && !isLoading && (
+      {/* {isConnected && address && !isLoading && (
         <div className="mt-2 text-sm text-gray-600">
           Connected: {address}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

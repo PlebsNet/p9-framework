@@ -44,28 +44,26 @@ export default function WalletConnect() {
     <>
       <div className="font-semibold flex flex-col">
         {isSignedIn && (
-          <div className='flex flex-col gap-4 m-4 text-gray-950 text-xs'>
+          <div className='flex flex-col gap-4 m-4 text-xs'>
 
-            <Separator />
-
-            {/* Avatar */}
-            <div className='flex items-center gap-2'>
-              <Avatar>
-                <AvatarImage
-                  src={session?.user?.image || ''}
-                  alt="Profile picture"
-                />
-                <AvatarFallback>
-                  {session?.user?.email?.[0]?.toUpperCase() ?? "U"}
-                </AvatarFallback>
-              </Avatar>
-
-              {session?.user?.name && (
-                <p className="text-sm font-medium">
-                  {session.user.name}
-                </p>
-              )}
-            </div>
+              <div className='flex items-center mt-1 gap-2'>
+                <Button asChild className="w-full border-gray-700 bg-gray-700" variant="outline">
+                  <Link href="/profile" >
+                    <Avatar>
+                      <AvatarImage
+                        src={session?.user?.image || ''}
+                        alt="Profile picture"
+                      />
+                      <AvatarFallback>
+                        {session?.user?.email?.[0]?.toUpperCase() ?? <User />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm font-medium">
+                      {session?.user?.name ? session.user.name : "Profile"}
+                    </p>
+                  </Link>
+                </Button>
+              </div>
 
             <Separator />
 
@@ -96,18 +94,6 @@ export default function WalletConnect() {
                 </Button>
               )}
             </div>
-
-            <Separator />
-
-            {/* Profile page */}
-            <div className='flex items-center gap-2'>
-              <Button asChild variant="link" className="text-gray-950">
-                <Link href="/profile" >
-                  Profile <User height={16} />
-                </Link>
-              </Button>
-            </div>
-
 
             <Separator />
 

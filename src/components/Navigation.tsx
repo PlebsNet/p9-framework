@@ -7,13 +7,13 @@ import { useIsSignedIn } from "@/hooks/useIsSignedIn";
 import { useIsMobile } from '@/hooks/useIsMobile';
 import WalletConnect from '@/components/WalletConnect';
 import { motion, AnimatePresence } from "framer-motion";
-import { Dot, Logomark } from '@/components/Icons';
+import { Cross, Dot, Logomark } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 
 const menu = {
   open: {
     opacity: 1,
-    minWidth: "160px",
+    minWidth: "200px",
     minHeight: "320px",
     top: "-4px",
     right: "-4px",
@@ -25,10 +25,10 @@ const menu = {
   },
   closed: {
     opacity: 0,
-    width: "54px",
-    height: "16px",
-    top: "16px",
-    right: "16px",
+    width: "32px",
+    height: "8px",
+    top: "0",
+    right: "0",
     transition: {
       duration: 0.3,
       delay: 0.35,
@@ -78,9 +78,11 @@ export default function Navigation() {
           <motion.div
             className="absolute bg-gray-800 rounded-lg"
             variants={menu}
+            initial="closed"
             animate={isActive ? "open" : "closed"}
             // initial="closed"
           >
+            <div className="pt-8 ">
             <AnimatePresence>
               <motion.div
                 className="h-full w-full flex items-center justify-center"
@@ -91,6 +93,7 @@ export default function Navigation() {
                 <WalletConnect />
               </motion.div>
             </AnimatePresence>
+            </div>
           </motion.div>
 
           <div className="flex gap-2 items-center justify-center absolute top-2 right-2 overflow-hidden z-999">
@@ -101,7 +104,7 @@ export default function Navigation() {
                 variant={isActive ? "outline" : "primary"}
                 onClick={() => setIsActive(!isActive)}
               >
-                {isActive ? "Close" : "Connected"}
+                {isActive ? <Cross height="18px" /> : "Connected"}
               </Button>
             ) : (
               <Button asChild>

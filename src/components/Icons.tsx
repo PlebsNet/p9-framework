@@ -69,3 +69,10 @@ export const Dot = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>
     <circle cx="12.1" cy="12.1" r="1" />
   </IconBase>
 )));
+
+export const Cross = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
+  <IconBase ref={ref} aria-label="Cross icon" {...props}>
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </IconBase>
+)));
