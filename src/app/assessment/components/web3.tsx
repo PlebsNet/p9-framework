@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -13,11 +12,13 @@ import { useContainerSize } from '@/hooks/useContainerSize';
 import { useAccount, useChainId } from 'wagmi';
 import { useDepositTriple } from '@/hooks/useDepositTriple';
 import { MULTIVAULT_CONTRACT_ADDRESS, BLOCK_EXPLORER_URL } from '@/config/blockchain';
-import { parseUnits } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
 import { Abi } from 'viem';
 import { multivaultAbi } from '@/lib/abis/multivault';
 import { baseSepolia } from 'viem/chains';
 import { flushSync } from "react-dom";
+import { useMultivaultContract } from '@/hooks/useMultivaultContract';
+import { useContractRead } from 'wagmi';
 
 const ANIM = { duration: 0.3 };
 const STORAGE_ANS = "plebs_answers_web3";
@@ -33,6 +34,7 @@ interface TransactionStatus {
 interface PendingTransaction {
     questionId: string;
     tripleId: number;
+    answer: number;
 }
 
 export default function Web3Assessment() {
@@ -45,6 +47,16 @@ export default function Web3Assessment() {
         writeContractAsync,
         onReceipt
     } = useDepositTriple(MULTIVAULT_CONTRACT_ADDRESS);
+
+    // Get minimum deposit amount from contract
+    const { data: generalConfig } = useContractRead({
+        address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
+        abi: multivaultAbi as Abi,
+        functionName: 'generalConfig',
+        chainId: baseSepolia.id,
+    }) as { data: [string, string, bigint, bigint, bigint, bigint, bigint, bigint] | undefined };
+
+    const minDeposit = generalConfig ? formatUnits(generalConfig[3], 18) : '0.001'; // minDeposit is at index 3
 
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,6 +73,34 @@ export default function Web3Assessment() {
 
             setIsProcessingQueue(true);
             const currentTx = pendingTransactions[0];
+            const answer = answers[currentTx.questionId];
+
+            // Skip if answer is neutral (4)
+            if (answer === 4) {
+                setTransactionStatuses(prev => ({
+                    ...prev,
+                    [currentTx.questionId]: {
+                        questionId: currentTx.questionId,
+                        status: 'success'
+                    }
+                }));
+                setPendingTransactions(prev => prev.slice(1));
+                setIsProcessingQueue(false);
+                return;
+            }
+
+            // Calculate deposit amount based on answer
+            let multiplier = 0;
+            if (answer <= 3) { // Disagree (1-3)
+                multiplier = 4 - answer; // 3x for 1, 2x for 2, 1x for 3
+            } else if (answer >= 5) { // Agree (5-7)
+                multiplier = answer - 4; // 1x for 5, 2x for 6, 3x for 7
+            }
+
+            const depositAmount = parseUnits(
+                (Number(minDeposit) * multiplier).toString(),
+                18
+            );
 
             try {
                 const hash = await writeContractAsync({
@@ -68,7 +108,7 @@ export default function Web3Assessment() {
                     abi: multivaultAbi as Abi,
                     functionName: 'depositTriple',
                     args: [address as `0x${string}`, BigInt(currentTx.tripleId)],
-                    value: parseUnits('0.001', 18),
+                    value: depositAmount,
                     chain: baseSepolia
                 });
 
@@ -106,7 +146,7 @@ export default function Web3Assessment() {
         };
 
         processQueue();
-    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt]);
+    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt, answers, minDeposit]);
 
     // Hydrate once on mount (fire-and-forget)
     useEffect(() => {
@@ -158,7 +198,8 @@ export default function Web3Assessment() {
             if (question?.triple) {
                 setPendingTransactions(prev => [...prev, {
                     questionId: id,
-                    tripleId: question.triple.id
+                    tripleId: question.triple.id,
+                    answer: value
                 }]);
 
                 // Set initial pending status
