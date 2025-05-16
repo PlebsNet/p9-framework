@@ -9,14 +9,21 @@ import { Logomark } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { ConnectAndSIWE } from "@/components/ConnectAndSIWE";
 
+type Provider = {
+  id: string;
+  name: string;
+  type: string;
+  signinUrl: string;
+  callbackUrl: string;
+};
 
 export default function SignInPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = decodeURIComponent(searchParams.get("callbackUrl") || "/");
-  const [providers, setProviders] = useState<Record<string, any>>({});
-  const [walletAuthenticated, setWalletAuthenticated] = useState(false);
+  const [providers, setProviders] = useState<Record<string, Provider>>({});
+  const [, setWalletAuthenticated] = useState(false);
 
   // If already logged in, redirect to callback URL
   useEffect(() => {
@@ -36,7 +43,7 @@ export default function SignInPage() {
             acc[provider.id] = provider;
           }
           return acc;
-        }, {} as Record<string, any>);
+        }, {} as Record<string, Provider>);
 
         setProviders(filteredProviders);
       }
@@ -44,7 +51,7 @@ export default function SignInPage() {
   }, []);
 
   // Handle wallet authentication callback
-  const handleWalletVerified = (address: string) => {
+  const handleWalletVerified = () => {
     setWalletAuthenticated(true);
 
     // Redirect after successful wallet authentication
@@ -86,7 +93,7 @@ export default function SignInPage() {
         {/* Wallet connector with SIWE */}
         <ConnectAndSIWE
           onVerified={handleWalletVerified}
-          onConnectChange={(connected) => {
+          onConnectChange={() => {
             // This can be used for UI feedback
           }}
         />
