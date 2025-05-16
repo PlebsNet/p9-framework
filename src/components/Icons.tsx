@@ -64,3 +64,8 @@ export const Brain = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement
   </IconBase>
 )));
 
+export const Dot = memo(forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
+  <IconBase ref={ref} aria-label="Dot icon" {...props}>
+    <circle cx="12.1" cy="12.1" r="1" />
+  </IconBase>
+)));

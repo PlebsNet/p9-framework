@@ -10,12 +10,14 @@ import { useAccount, useDisconnect, useConnect } from "wagmi";
 import { cbWalletConnector } from "@/lib/wagmiConfig";
 import { Separator } from '@/components/ui/Separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/Avatar';
+import { formatEvmAddress } from '@/lib/helpers';
+import { User } from './Icons';
 
 export default function WalletConnect() {
   const { data: session } = useSession();
   const isSignedIn = useIsSignedIn();
   const pathname = usePathname();
-  const { address, isConnected } = useAccount();
+  const { address: connectedAddress, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { connect } = useConnect();
   if (pathname === "/auth/signin") return null;
@@ -23,7 +25,6 @@ export default function WalletConnect() {
   const connectAndLinkWallet = async () => {
     try {
       await connect({ connector: cbWalletConnector });
-      const connectedAddress = address;
       if (!connectedAddress || session?.user?.ethAddress === connectedAddress) return;
       if (!session?.user?.id) return;
       const res = await fetch("/api/user/link-wallet", {
@@ -41,45 +42,74 @@ export default function WalletConnect() {
 
   return (
     <>
-      <div className="fixed right-6 top-6 z-[999] flex flex-col gap-2 items-end">
+      <div className="font-semibold flex flex-col">
         {isSignedIn && (
-          <div className='flex flex-col gap-4 items-end p-4 rounded-lg bg-gray-800 text-xs'>
-            <Link href="/assessment" className="hover:opacity-80">
-              Assessment
-            </Link>
-            <Link href="/profile" className="hover:opacity-80">
-              Profile
-            </Link>
+          <div className='flex flex-col gap-4 m-4 text-gray-950 text-xs'>
 
             <Separator />
 
-            <div className="flex items-center gap-2">
+            {/* Avatar */}
+            <div className='flex items-center gap-2'>
               <Avatar>
-                <AvatarImage src={session?.user?.image || ''} alt={session?.user?.email || 'User'} />
-                <AvatarFallback>{session?.user?.email?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+                <AvatarImage
+                  src={session?.user?.image || ''}
+                  alt="Profile picture"
+                />
+                <AvatarFallback>
+                  {session?.user?.email?.[0]?.toUpperCase() ?? "U"}
+                </AvatarFallback>
               </Avatar>
+
               {session?.user?.name && (
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium">
                   {session.user.name}
                 </p>
               )}
-              <p className="text-xs text-right text-gray-500">
-                Signed in as {session?.user?.email}
+            </div>
+
+            <Separator />
+
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <p className="flex flex-col text-xs">
+                <span>Email</span>
+                <span>{session?.user?.email}</span>
               </p>
             </div>
 
-            {session?.user?.ethAddress && (
-              <>
-                <p className="text-xs text-right text-gray-500">
-                  Wallet: {session.user.ethAddress}{" "}
+            <Separator />
+            
+            {/* Address */}
+            <div className="flex items-center gap-2">
+              {session?.user?.ethAddress && isConnected && connectedAddress === session.user.ethAddress && (
+                <p className="flex flex-col text-xs">
+                  <span>Wallet</span>
+                  <span>{formatEvmAddress(session.user.ethAddress)}</span>
                 </p>
-                {(!session?.user?.ethAddress || session.user.ethAddress !== address) && (
-                  <Button onClick={connectAndLinkWallet}>
-                    {!session?.user?.ethAddress ? "Link Wallet" : "Connect Wallet"}
-                  </Button>
-                )}
-              </>
-            )}
+              )}
+              {session?.user?.ethAddress && (!isConnected || connectedAddress !== session.user.ethAddress) && (
+                <Button
+                  size="xs"
+                  onClick={connectAndLinkWallet}
+                >
+                  {!session?.user?.ethAddress ? "Link Wallet" : "Connect Wallet"}
+                </Button>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* Profile page */}
+            <div className='flex items-center gap-2'>
+              <Button asChild variant="link" className="text-gray-950">
+                <Link href="/profile" >
+                  Profile <User height={16} />
+                </Link>
+              </Button>
+            </div>
+
+
+            <Separator />
 
             <Button variant="destructive" onClick={() => {
               disconnect();
@@ -91,7 +121,7 @@ export default function WalletConnect() {
         )}
 
         {!isSignedIn && (
-          <Button asChild className="fixed right-6 top-6 z-[1]">
+          <Button asChild>
             <Link href="/auth/signin">Sign in</Link>
           </Button>
         )}

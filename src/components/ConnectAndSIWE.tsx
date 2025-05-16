@@ -3,6 +3,8 @@ import { getCsrfToken, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { cbWalletConnector } from "@/lib/wagmiConfig";
+import { toast } from "sonner";
+import { Button } from './ui/Button';
 
 interface ConnectAndSIWEProps {
   onConnectChange?: (connected: boolean) => void;
@@ -128,6 +130,12 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
     }
   }, [isConnected, address, shouldSignIn]);
 
+  useEffect(() => {
+    if (processingStep) {
+      toast(processingStep);
+    }
+  }, [processingStep]);
+
   // Trigger the "connect wallet" flow, which will then trigger sign-in
   const handleConnectAndSignIn = () => {
     setShouldSignIn(true);
@@ -135,31 +143,25 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       {!isConnected ? (
         // Not connected - show the connect button
-        <button
+        <Button
           onClick={handleConnectAndSignIn}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           disabled={isLoading}
+          className="mb-3 w-full"
         >
-          {isLoading ? 'Connecting...' : 'Connect & Sign In'}
-        </button>
+          {isLoading ? 'Connecting...' : 'Connect with Base'}
+        </Button>
       ) : (
-        // Already connected - show sign in button
-        <button
+        // Already connected - show fallback sign in button for Next Auth
+        <Button
           onClick={handleSignIn}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           disabled={isLoading}
+          className="mb-3 w-full"
         >
-          {isLoading ? 'Signing in...' : 'Sign in with Ethereum'}
-        </button>
-      )}
-
-      {processingStep && (
-        <div className="mt-2 text-sm text-blue-600">
-          {processingStep}
-        </div>
+          {isLoading ? 'Signing in...' : 'Sign in with Base'}
+        </Button>
       )}
 
       {error && (

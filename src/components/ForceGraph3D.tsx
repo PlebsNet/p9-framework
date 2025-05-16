@@ -100,6 +100,10 @@ export default function DynamicGraph({ width, height }: DynamicGraphProps) {
   const distanceRef = useRef(600);
 
   useEffect(() => {
+    import('aframe');
+  }, []);
+
+  useEffect(() => {
     if (!fgRef.current) return;
 
     // Initialize camera position first

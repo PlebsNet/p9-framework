@@ -60,7 +60,7 @@ export function Providers(props: { children: ReactNode }) {
 
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <SessionProvider>
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>

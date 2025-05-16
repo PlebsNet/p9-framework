@@ -72,7 +72,6 @@ export default function SignInPage() {
           Sign in to Plebs
         </h2>
 
-        {/* Regular OAuth providers */}
         {Object.values(providers).map((prov) => (
           <Button
             size="lg"
