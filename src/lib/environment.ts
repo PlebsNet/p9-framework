@@ -3,7 +3,7 @@ import process from "process";
 import { Address } from "viem";
 import { base, baseSepolia, type mainnet } from "viem/chains";
 
-import logger from "@/lib/utils/logger";
+import logger from '@/lib/logger'
 
 const alchemyRpcUrlBaseSepolia = process.env.ALCHEMY_BASE_SEPOLIA_RPC_URL;
 
