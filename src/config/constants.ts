@@ -39,7 +39,7 @@ export const meta: MetaConfig = {
   url: 'https://plebs.net',
   canonical: 'hhttps://plebs.net',
   name: 'Plebs',
-  title: 'P9 Framework',
+  title: 'Plebs Framework',
   description: 'Discover the P in Personality',
   themeColor: '#000000',
   icons: {
