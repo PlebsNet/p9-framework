@@ -117,22 +117,6 @@ export default function Web2Assessment() {
                 </p>
             )}
 
-            <div className="mb-8 h-[200px] w-full relative overflow-hidden rounded-lg">
-                <div
-                    ref={containerRef}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        position: 'relative'
-                    }}
-                >
-                    <DynamicGraph
-                        width={dimensions.width}
-                        height={dimensions.height}
-                    />
-                </div>
-            </div>
-
             <AnimatePresence initial={false}>
                 {visible
                     .slice()

@@ -9,7 +9,7 @@ const Header = React.forwardRef<
   <header
     ref={ref}
     className={cn(
-      "flex flex-col items-center w-5xl mx-[92px] px-6",
+      "max-w-5xl flex flex-col flex-wrap items-center mx-[92px] px-6",
       className
     )}
     {...props}
@@ -24,7 +24,7 @@ const HeaderCover = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "h-[376px] w-full mx-auto",
+      "max-h-[376px] w-full mx-auto",
       className
     )}
     {...props}
@@ -54,7 +54,7 @@ const HeaderTitle = React.forwardRef<
   <h2
     ref={ref}
     className={cn(
-      "w-[640px] my-2 pb-4 text-[56px] text-center font-semibold tracking-[-1.25px] leading-[62px] gradient-text",
+      "w-full max-w-[640px] my-2 pb-4 text-[65px] text-center font-semibold tracking-[-1.25px] leading-[65px] gradient-text",
       className
     )}
     {...props}
@@ -69,7 +69,7 @@ const HeaderDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      "m-0 mb-8 p-0 max-full text-[17px] font-medium tracking-[-0.25px] leading-[29px] text-center",
+      "w-full m-0 mb-8 p-0 text-[18px] font-medium tracking-[-0.25px] leading-[24px] text-center",
       className
     )}
     {...props}

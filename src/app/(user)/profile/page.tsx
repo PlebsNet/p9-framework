@@ -22,7 +22,7 @@ export default async function ProfilePage() {
   const userId = session.user.id;
 
   // 2) Load user row (to get ethAddress) and assessments in parallel
-  const [, assessments] = await Promise.all([
+  const [user, assessments] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -69,23 +69,33 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Your Profile</h1>
-      <p className="text-sm text-blue-500 underline mb-4">
-        <Link href="/assessment">Retake test</Link>
-      </p>
+    <div className="max-w-4xl mx-auto p-6 md:py-16 space-y-12">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">Your Personality Profile</h1>
+        <Link
+          href="/assessment"
+          className="inline-block text-sm text-primary underline hover:text-primary/80 transition"
+        >
+          Retake the assessment
+        </Link>
+      </div>
 
       {latest ? (
-        <ProfileClient
-          dimData={dimData}
-          primary={primary}
-          assessments={assessmentsForClient}
-        />
+        <div className="bg-gray-900 rounded-lg p-6 shadow-sm">
+          <ProfileClient
+            dimData={dimData}
+            primary={primary}
+            assessments={assessmentsForClient}
+          />
+        </div>
       ) : (
-        <p>You haven’t taken a test yet.</p>
+        <p className="text-muted-foreground">You haven’t taken a test yet.</p>
       )}
 
-      <HistoryTable assessments={assessmentsForClient} />
+      <div className="bg-gray-900 rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">Past Assessments</h2>
+        <HistoryTable assessments={assessmentsForClient} />
+      </div>
     </div>
   );
 }

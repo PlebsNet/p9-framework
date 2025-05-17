@@ -5,15 +5,18 @@ import Link from "next/link";
 import { useInView, motion } from "framer-motion";
 import { Centroid } from "@/lib/archetypeCentroids";
 import { archetypes } from "@/lib/archetypes";
-import { ArchetypeAvatars, type ArchetypeSlug } from "./ArchetypeAvatars";
+import { ARCH_CLUSTER, CLUSTER_COLOR, ArchetypeAvatars, type ArchetypeSlug } from "./ArchetypeAvatars";
+import HoverCard from '@/components/HoverCard';
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface Props {
   slug: ArchetypeSlug;
   centroid: Centroid[];
-  className?: string;
-}
+};
 
-export function ArchetypeCard({ slug, className }: Props) {
+export function ArchetypeCard({ slug }: Props) {
+  const clusterKey = ARCH_CLUSTER[slug]
+  const mainColor = CLUSTER_COLOR[clusterKey];
   const archetype = archetypes.find((a) => a.slug === slug);
 
   if (!archetype) {
@@ -24,6 +27,7 @@ export function ArchetypeCard({ slug, className }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <motion.div
@@ -31,7 +35,6 @@ export function ArchetypeCard({ slug, className }: Props) {
       initial={{ opacity: 0 }}
       animate={isInView && { opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className={className}
     >
       <Link href={`/archetypes/${slug}`}>
         <motion.div
@@ -44,15 +47,19 @@ export function ArchetypeCard({ slug, className }: Props) {
           onMouseLeave={() => {
             setIsHovered(false);
           }}
-          className={`m-1 relative h-[550px] rounded-xl bg-gray-800 p-4 shadow-md hover:shadow-xl flex flex-col items-start justify-between overflow-hidden group opacity-50 transition-opacity hover:opacity-100 ${isHovered ? "z-30" : "z-10"}`}
+          className={`max-md:aspect-square m-1 relative h-[550px] rounded-xl bg-gray-800 shadow-md hover:shadow-xl flex flex-col items-start justify-between overflow-hidden group border-transparent hover:border-gray-800 transition-border transition-opacity ${isHovered ? "z-30" : "z-10"}`}
         >
-          <div className=" w-full h-16">
-            {ArchetypeAvatars[slug]}
-          </div>
-          <div className="mt-4 w-[240px] opacity-0 group-hover:opacity-100 transition-all">
-            <h3 className="font-semibold text-xl mb-1">{name}</h3>
-            <p className="text-xs mb-3">{signature}</p>
-          </div>
+          <HoverCard mainColor={mainColor}>
+            <div className="flex flex-col w-full h-full">
+              <div className="w-full h-16">
+                {ArchetypeAvatars[slug]}
+              </div>
+              <div className="mt-auto pt-4 min-w-[240px] opacity-0 group-hover:opacity-100 transition-all">
+                <h3 className="font-semibold text-xl mb-1">{name}</h3>
+                <p className="text-xs mb-3">{signature}</p>
+              </div>
+            </div>
+          </HoverCard>
         </motion.div>
       </Link>
     </motion.div>

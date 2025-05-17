@@ -18,6 +18,7 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { config } from "@/lib/wagmiConfig";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@/lib/graphql";
+import { Spotlight } from "@/components/ui/Spotlight";
 
 const httpLink = createHttpLink({
   uri: 'https://dev.base-sepolia.intuition-api.com/v1/graphql',
@@ -60,7 +61,7 @@ export function Providers(props: { children: ReactNode }) {
 
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <SessionProvider>
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
@@ -70,6 +71,18 @@ export function Providers(props: { children: ReactNode }) {
           </QueryClientProvider>
         </WagmiProvider>
       </SessionProvider>
+      <div className="
+        -z-1
+        pointer-events-none 
+        h-[50vh]
+        absolute 
+        inset-0 
+        bg-[url('/grain.png')] 
+        bg-[length:128px] 
+        bg-repeat 
+        opacity-[0.04]
+        mask-[linear-gradient(to_bottom,black,transparent)]
+      "/>
     </>
   )
 }
