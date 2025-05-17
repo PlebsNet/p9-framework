@@ -53,8 +53,8 @@ export default function Home() {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="lg">
-              <Link href="/whitepaper.pdf">
-                <span className="z-1 gradient-text">Read the whitepaper</span>
+              <Link href="/paper.pdf">
+                <span className="z-1 gradient-text">Read the paper</span>
                 <ChevronRight className="transition-transform duration-200 ease-out group-hover:translate-x-2" />
               </Link>
             </Button>

@@ -12,18 +12,11 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 interface Props {
   slug: ArchetypeSlug;
   centroid: Centroid[];
-<<<<<<< Updated upstream
-  className?: string;
-}
-
-export function ArchetypeCard({ slug, className }: Props) {
-=======
 };
 
 export function ArchetypeCard({ slug }: Props) {
   const clusterKey = ARCH_CLUSTER[slug]
   const mainColor = CLUSTER_COLOR[clusterKey];
->>>>>>> Stashed changes
   const archetype = archetypes.find((a) => a.slug === slug);
 
   if (!archetype) {
@@ -42,7 +35,6 @@ export function ArchetypeCard({ slug }: Props) {
       initial={{ opacity: 0 }}
       animate={isInView && { opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className={className}
     >
       <Link href={`/archetypes/${slug}`}>
         <motion.div

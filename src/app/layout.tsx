@@ -2,11 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/react';
 import { meta } from '@/config/constants';
 import { Providers } from "./providers";
-<<<<<<< Updated upstream
-import { Inter } from "next/font/google";
-=======
 import { Gabarito } from "next/font/google";
->>>>>>> Stashed changes
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";

@@ -210,9 +210,6 @@ export default function Web3Assessment() {
     return (
         <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">Web3 Personality Assessment</h2>
-            <p className="text-sm text-gray-600 mb-4">
-                Connected wallet: {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}
-            </p>
 
             {currentChainId !== 84532 && (
                 <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-md text-yellow-500 text-sm">

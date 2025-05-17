@@ -7,7 +7,7 @@ import { useIsSignedIn } from "@/hooks/useIsSignedIn";
 import { useIsMobile } from '@/hooks/useIsMobile';
 import WalletConnect from '@/components/WalletConnect';
 import { motion, AnimatePresence } from "framer-motion";
-import { Dot, Logomark, Minimize } from '@/components/Icons';
+import { Cross, Dot, Logomark, Minimize, Scaling, Shrink } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 
 const menu = {
