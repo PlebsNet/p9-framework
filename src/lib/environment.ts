@@ -3,8 +3,6 @@ import process from "process";
 import { Address } from "viem";
 import { base, baseSepolia, type mainnet } from "viem/chains";
 
-import logger from "@/lib/utils/logger";
-
 const alchemyRpcUrlBaseSepolia = process.env.ALCHEMY_BASE_SEPOLIA_RPC_URL;
 
 const alchemyRpcUrlBaseMainnet = process.env.ALCHEMY_BASE_RPC_URL;
@@ -57,7 +55,6 @@ export const getChainEnvConfig = (env: string): ChainConfig => {
     return chainOptions[DEFAULT_CHAIN_ENV];
   }
   if (!(env in chainOptions)) {
-    logger(`No config for provided environment: ${env}.`);
     return chainOptions[DEFAULT_CHAIN_ENV];
   }
   return chainOptions[env as ChainEnv];

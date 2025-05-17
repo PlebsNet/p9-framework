@@ -10,9 +10,10 @@ import { ArchetypeAvatars, type ArchetypeSlug } from "./ArchetypeAvatars";
 interface Props {
   slug: ArchetypeSlug;
   centroid: Centroid[];
+  className?: string;
 }
 
-export function ArchetypeCard({ slug }: Props) {
+export function ArchetypeCard({ slug, className }: Props) {
   const archetype = archetypes.find((a) => a.slug === slug);
 
   if (!archetype) {
@@ -30,6 +31,7 @@ export function ArchetypeCard({ slug }: Props) {
       initial={{ opacity: 0 }}
       animate={isInView && { opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
+      className={className}
     >
       <Link href={`/archetypes/${slug}`}>
         <motion.div

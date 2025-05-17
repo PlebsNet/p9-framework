@@ -45,12 +45,15 @@ export default function Loading() {
 
   // Effect to initiate and manage the animation loops for each shape
   useEffect(() => {
+    // Store the current ref value to use in cleanup
+    const currentTimers = shapeTimers.current;
+
     // Recursive function to animate each shape independently with randomized delays
     const startLoop = (i: number) => {
       // Random delay before starting the animation cycle for shape i
       const delay = 100 + Math.random() * 2000;
 
-      shapeTimers.current[i] = window.setTimeout(() => {
+      currentTimers[i] = window.setTimeout(() => {
         // Fade out the current shape by setting opacity to 0
         setShapes((prev) => {
           const next = [...prev];
@@ -95,8 +98,8 @@ export default function Loading() {
     });
 
     // Cleanup all scheduled timeouts when component unmounts
-    return () => shapeTimers.current.forEach(clearTimeout);
-  }, []);
+    return () => currentTimers.forEach(clearTimeout);
+  }, [shapes]);
 
   return (
     <div

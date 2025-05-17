@@ -15,8 +15,8 @@ export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = decodeURIComponent(searchParams.get("callbackUrl") || "/");
-  const [providers, setProviders] = useState<Record<string, any>>({});
-  const [walletAuthenticated, setWalletAuthenticated] = useState(false);
+  const [providers, setProviders] = useState<Record<string, Provider>>({});
+  const [, setWalletAuthenticated] = useState(false);
 
   // If already logged in, redirect to callback URL
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function SignInPage() {
             acc[provider.id] = provider;
           }
           return acc;
-        }, {} as Record<string, any>);
+        }, {} as Record<string, Provider>);
 
         setProviders(filteredProviders);
       }
@@ -44,7 +44,7 @@ export default function SignInPage() {
   }, []);
 
   // Handle wallet authentication callback
-  const handleWalletVerified = (address: string) => {
+  const handleWalletVerified = () => {
     setWalletAuthenticated(true);
 
     // Redirect after successful wallet authentication
