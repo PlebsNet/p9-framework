@@ -6,8 +6,7 @@ import { useInView, motion } from "framer-motion";
 import { Centroid } from "@/lib/archetypeCentroids";
 import { archetypes } from "@/lib/archetypes";
 import { ARCH_CLUSTER, CLUSTER_COLOR, ArchetypeAvatars, type ArchetypeSlug } from "./ArchetypeAvatars";
-import HoverCard from '@/components/HoverCard';
-import { useIsMobile } from "@/hooks/useIsMobile";
+import ArchetypeCardEffect from '@/components/ArchetypeCardEffect';
 
 interface Props {
   slug: ArchetypeSlug;
@@ -27,7 +26,6 @@ export function ArchetypeCard({ slug }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const [isHovered, setIsHovered] = useState(false);
-  const isMobile = useIsMobile();
 
   return (
     <motion.div
@@ -49,7 +47,7 @@ export function ArchetypeCard({ slug }: Props) {
           }}
           className={`max-md:aspect-square m-1 relative h-[550px] rounded-xl bg-gray-800 shadow-md hover:shadow-xl flex flex-col items-start justify-between overflow-hidden group border-transparent hover:border-gray-800 transition-border transition-opacity ${isHovered ? "z-30" : "z-10"}`}
         >
-          <HoverCard mainColor={mainColor}>
+          <ArchetypeCardEffect mainColor={mainColor}>
             <div className="flex flex-col w-full h-full">
               <div className="w-full h-16">
                 {ArchetypeAvatars[slug]}
@@ -59,7 +57,7 @@ export function ArchetypeCard({ slug }: Props) {
                 <p className="text-xs mb-3">{signature}</p>
               </div>
             </div>
-          </HoverCard>
+          </ArchetypeCardEffect>
         </motion.div>
       </Link>
     </motion.div>

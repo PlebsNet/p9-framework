@@ -4,10 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { useIsSignedIn } from "@/hooks/useIsSignedIn";
-import { useIsMobile } from '@/hooks/useIsMobile';
 import WalletConnect from '@/components/WalletConnect';
 import { motion, AnimatePresence } from "framer-motion";
-import { Cross, Dot, Logomark, Minimize, Scaling, Shrink } from '@/components/Icons';
+import { Dot, Logomark, Minimize } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 
 const menu = {
@@ -60,8 +59,6 @@ const menuContent = {
 
 export default function Navigation() {
   const isSignedIn = useIsSignedIn();
-  const isMobile = useIsMobile();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const [isActive, setIsActive] = useState(false);
   if (pathname === "/auth/signin") return null;
@@ -80,7 +77,6 @@ export default function Navigation() {
             variants={menu}
             initial="closed"
             animate={isActive ? "open" : "closed"}
-            // initial="closed"
           >
             <div className="pt-8 ">
             <AnimatePresence>
