@@ -2,13 +2,17 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/react';
 import { meta } from '@/config/constants';
 import { Providers } from "./providers";
+<<<<<<< Updated upstream
 import { Inter } from "next/font/google";
+=======
+import { Gabarito } from "next/font/google";
+>>>>>>> Stashed changes
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const sans = Gabarito({
+  variable: "--font-sans",
   subsets: ["latin-ext"],
 });
 
@@ -76,7 +80,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased bg-neutral-950 min-h-screen`}>
+      <body className={`${sans.variable} antialiased bg-neutral-950 min-h-screen`}>
         <Providers>
           <Navigation />
           <main>

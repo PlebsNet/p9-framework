@@ -7,7 +7,7 @@ import { useIsSignedIn } from "@/hooks/useIsSignedIn";
 import { useIsMobile } from '@/hooks/useIsMobile';
 import WalletConnect from '@/components/WalletConnect';
 import { motion, AnimatePresence } from "framer-motion";
-import { Cross, Dot, Logomark } from '@/components/Icons';
+import { Dot, Logomark, Minimize } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 
 const menu = {
@@ -104,7 +104,7 @@ export default function Navigation() {
                 variant={isActive ? "outline" : "primary"}
                 onClick={() => setIsActive(!isActive)}
               >
-                {isActive ? <Cross height="18px" /> : "Connected"}
+                {isActive ? <Minimize height="18px" /> : "Connected"}
               </Button>
             ) : (
               <Button asChild>

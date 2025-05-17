@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -17,7 +16,6 @@ import { parseUnits } from 'viem';
 import { Abi } from 'viem';
 import { multivaultAbi } from '@/lib/abis/multivault';
 import { baseSepolia } from 'viem/chains';
-import { flushSync } from "react-dom";
 
 const ANIM = { duration: 0.3 };
 const STORAGE_ANS = "plebs_answers_web3";
@@ -146,11 +144,9 @@ export default function Web3Assessment() {
             setAnswers((prev) => ({ ...prev, [id]: value }));
             const idx = questions.findIndex((q) => q.id === id);
 
-            // Advance to next question immediately, synchronously
             if (idx === currentIndex && currentIndex < total - 1) {
-                flushSync(() => {
-                    setCurrentIndex(idx + 1);
-                });
+                // Advance to next question immediately
+                setCurrentIndex(idx + 1);
             }
 
             // Add transaction to queue
