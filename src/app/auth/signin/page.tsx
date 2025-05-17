@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { signIn, getProviders, useSession } from "next-auth/react";
+import type { ClientSafeProvider } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,8 +16,8 @@ export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = decodeURIComponent(searchParams.get("callbackUrl") || "/");
-  const [providers, setProviders] = useState<Record<string, any>>({});
-  const [walletAuthenticated, setWalletAuthenticated] = useState(false);
+  const [providers, setProviders] = useState<Record<string, ClientSafeProvider>>({});
+  const [, setWalletAuthenticated] = useState(false);
 
   // If already logged in, redirect to callback URL
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function SignInPage() {
             acc[provider.id] = provider;
           }
           return acc;
-        }, {} as Record<string, any>);
+        }, {} as Record<string, ClientSafeProvider>);
 
         setProviders(filteredProviders);
       }
@@ -44,7 +45,7 @@ export default function SignInPage() {
   }, []);
 
   // Handle wallet authentication callback
-  const handleWalletVerified = (address: string) => {
+  const handleWalletVerified = () => {
     setWalletAuthenticated(true);
 
     // Redirect after successful wallet authentication
@@ -75,7 +76,7 @@ export default function SignInPage() {
         <div className="flex flex-col gap-4 w-72">
           <ConnectAndSIWE
             onVerified={handleWalletVerified}
-            onConnectChange={(connected) => {
+            onConnectChange={() => {
               // This can be used for UI feedback
             }}
           />

@@ -1,5 +1,4 @@
-import type { RequestInternal } from "next-auth";
-import { getAddress, isAddress, verifyMessage } from "ethers";
+import { getAddress, isAddress } from "ethers";
 import { type NextAuthOptions } from "next-auth";
 import type { User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -12,6 +11,7 @@ import { cookies } from "next/headers";
 // Define extended user type for TypeScript safety
 interface ExtendedUser extends User {
   ethAddress?: string;
+  role: "USER" | "ADMIN";
 }
 
 // Fallback error handling for missing Google env vars
@@ -35,8 +35,7 @@ export const authOptions: NextAuthOptions = {
         signature: { label: "Signature", type: "text" },
       },
       async authorize(
-        credentials: Record<"message" | "signature", string> | undefined,
-        req: Pick<RequestInternal, "query" | "headers" | "body" | "method">
+        credentials: Record<"message" | "signature", string> | undefined
       ): Promise<ExtendedUser | null> {
         try {
           if (!credentials?.message || !credentials?.signature) {
@@ -114,6 +113,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email || undefined,
             image: user.image || undefined,
             ethAddress: user.ethAddress || undefined,
+            role: user.role,
           };
         } catch (error) {
           console.error("❗ SIWE authorize unhandled error:", error);
@@ -174,10 +174,11 @@ export const authOptions: NextAuthOptions = {
       // When a user signs in, add their data to the token
       if (user) {
         token.sub = user.id;
-        token.email = user.email ?? null;
-        token.name = user.name ?? null;
-        token.picture = user.image ?? null;
-        token.ethAddress = (user as ExtendedUser).ethAddress ?? null;
+        token.email = user.email ?? undefined;
+        token.name = user.name ?? undefined;
+        token.picture = user.image ?? undefined;
+        token.ethAddress = (user as ExtendedUser).ethAddress ?? undefined;
+        token.role = (user as ExtendedUser).role ?? undefined;
       }
 
       // Include the sign-in provider if available
@@ -191,10 +192,11 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token.sub) {
         // Transfer data from token to session
         session.user.id = token.sub;
-        session.user.email = token.email as string | null;
-        session.user.name = token.name as string | null;
-        session.user.image = token.picture as string | null;
-        (session.user as ExtendedUser).ethAddress = token.ethAddress as string | null;
+        session.user.email = token.email ?? undefined;
+        session.user.name = token.name ?? undefined;
+        session.user.image = token.picture ?? undefined;
+        (session.user as ExtendedUser).ethAddress = token.ethAddress as string | undefined;
+        (session.user as ExtendedUser).role = (token.role as "USER" | "ADMIN") ?? "USER";
       }
 
       return session;

@@ -18,7 +18,6 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { config } from "@/lib/wagmiConfig";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@/lib/graphql";
-import { Spotlight } from "@/components/ui/Spotlight";
 
 const httpLink = createHttpLink({
   uri: 'https://dev.base-sepolia.intuition-api.com/v1/graphql',

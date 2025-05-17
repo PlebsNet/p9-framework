@@ -140,7 +140,7 @@ export default function Home() {
             Talk with your own agent, uniquely trained and built around your personality dimensions.
           </HeaderDescription>
           <p className="max-w-2xl text-center">
-            Your Plebs Agent isn't just a chatbot—it's a context-aware, cognitive companion that evolves with your inputs. It draws from your assessment, behavior, and preferences to deliver advice, reflections, and smart nudges when you need them most.
+            Your Plebs Agent isn&apos;t just a chatbot—it&apos;s a context-aware, cognitive companion that evolves with your inputs. It draws from your assessment, behavior, and preferences to deliver advice, reflections, and smart nudges when you need them most.
           </p>
         </Header>
         <AgentInput

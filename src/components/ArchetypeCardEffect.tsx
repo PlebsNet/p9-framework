@@ -1,144 +1,134 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import { useState, useRef } from 'react';
+import { ReactNode } from 'react';
 
-// All valid slugs
-export type ArchetypeSlug =
-  | "visionary"
-  | "innovator"
-  | "investigator"
-  | "commander"
-  | "strategist"
-  | "guardian"
-  | "influencer"
-  | "mediator"
-  | "integrator";
-
-// Cluster colors (as literal)
-export const CLUSTER_COLOR = {
-  explorer: "#65E2E2",
-  executor: "#E2B865",
-  enabler: "#E265E2",
-} as const;
-
-// Assign each archetype to a cluster
-export const ARCH_CLUSTER: Record<ArchetypeSlug, keyof typeof CLUSTER_COLOR> = {
-  visionary: "explorer",
-  innovator: "explorer",
-  integrator: "explorer",
-  commander: "executor",
-  strategist: "executor",
-  influencer: "executor",
-  guardian: "enabler",
-  mediator: "enabler",
-  investigator: "enabler",
-};
-
-// Silhouette outline (simplified head+shoulders)
-const SILHOUETTE_PATH =
-  "M32 4C21 4 12 12 12 23v18c0 11 9 19 20 19s20-8 20-19V23c0-11-9-19-20-19z";
-
-// Signature shapes
-function Signature({ slug }: { slug: ArchetypeSlug }) {
-  const color = CLUSTER_COLOR[ARCH_CLUSTER[slug]];
-  const sigProps = {
-    stroke: color,
-    strokeWidth: 2 as const,
-    fill: "none" as const,
-    strokeLinecap: "round" as const,
-  };
-
-  switch (slug) {
-    case "visionary":
-      return (
-        <>
-          <circle cx="32" cy="32" r="3" {...sigProps} />
-          <circle cx="32" cy="32" r="9" {...sigProps} />
-          <circle cx="32" cy="32" r="15" {...sigProps} />
-        </>
-      );
-    case "innovator":
-      return <circle cx="32" cy="32" r="10" {...sigProps} />;
-    case "investigator":
-      return (
-        <>
-          <line x1="32" y1="24" x2="32" y2="18" {...sigProps} />
-          <line x1="32" y1="40" x2="32" y2="46" {...sigProps} />
-          <line x1="18" y1="32" x2="24" y2="32" {...sigProps} />
-          <line x1="40" y1="32" x2="46" y2="32" {...sigProps} />
-          <rect width="16" height="16" x="24" y="24" {...sigProps} />
-        </>
-      );
-    case "commander":
-      return (
-        <>  
-          <line x1="40" y1="38" x2="32" y2="26" {...sigProps} />
-          <line x1="24" y1="38" x2="32" y2="26" {...sigProps} />
-          <line x1="24" y1="38" x2="40" y2="38" {...sigProps} />
-        </>  
-      );
-    case "strategist":
-      return (
-        <>
-          <circle cx="32" cy="24" r="2" {...sigProps} />
-          <circle cx="23" cy="38" r="2" {...sigProps} />
-          <circle cx="41" cy="38" r="2" {...sigProps} />
-          <path d="M32 26 L32 34 M32 34 L26 37 M32 34 L38 37" {...sigProps} />
-        </>
-      );
-    case "guardian":
-      return (
-        <>
-          <rect width="20" height="20" x="22" y="22" {...sigProps} />
-          <line x1="22" y1="27" x2="32" y2="27" {...sigProps} />
-          <line x1="37" y1="22" x2="37" y2="32" {...sigProps} />
-          <line x1="32" y1="37" x2="42" y2="37" {...sigProps} />
-          <line x1="27" y1="42" x2="27" y2="32" {...sigProps} />
-        </>
-      );
-    case "influencer":
-      return (
-        <>
-          <line x1="28" y1="24" x2="28" y2="44" {...sigProps} />
-          <line x1="32" y1="24" x2="32" y2="44" {...sigProps} />
-          <line x1="36" y1="24" x2="36" y2="44" {...sigProps} />
-        </>
-      );
-    case "mediator":
-      return (
-        <>
-          <line x1="20" y1="32" x2="32" y2="20" {...sigProps} />
-          <line x1="20" y1="32" x2="32" y2="44" {...sigProps} />
-          <line x1="44" y1="32" x2="32" y2="44" {...sigProps} />
-          <line x1="32" y1="20" x2="44" y2="32" {...sigProps} />
-        </>
-      );
-    case "integrator":
-      return (
-        <>
-          <circle cx="28" cy="32" r="10" {...sigProps} />
-          <circle cx="36" cy="32" r="10" {...sigProps} />
-        </>
-      );
-    default:
-      return null;
-  }
+interface ArchetypeCardEffectProps {
+  children: ReactNode;
+  className?: string;
+  width?: string;
+  height?: string;
+  bgColor?: string;
+  cardSize?: string;
+  fontSize?: string;
+  mainColor?: string;
+  mainLightColor?: string;
+  secondaryColor?: string;
+  bgLightColor?: string;
+  charLength?: number;
 }
 
-// Build the final SVG for each slug
-export const ArchetypeAvatars: Record<ArchetypeSlug, ReactNode> =
-  (Object.keys(ARCH_CLUSTER) as ArchetypeSlug[]).reduce((acc, slug) => {
-    const color = CLUSTER_COLOR[ARCH_CLUSTER[slug]];
+const ArchetypeCardEffect = ({
+  children,
+  className = "",
+  width = "w-full",
+  height = "h-full",
+  bgColor = "bg-gray-900",
+  cardSize = "16rem",
+  fontSize = "0.6rem",
+  mainColor = "rgb(90, 30, 255)",
+  mainLightColor = "120, 80, 255",
+  secondaryColor = "60, 190, 255",
+  bgLightColor = "30, 30, 30",
+  charLength = 1500
+}: ArchetypeCardEffectProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const lettersRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
-    acc[slug] = (
-      <svg
-        key={slug}
-        viewBox="0 0 64 64"
-        className="w-full h-full"
-      >
-        <Signature slug={slug} />
-      </svg>
-    );
+  // Generate random characters
+  const generateRandomChars = (length: number) => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    return Array.from({ length }).map(() => {
+      return chars[Math.floor(Math.random() * chars.length)];
+    }).join("");
+  };
 
-    return acc;
-  }, {} as Record<ArchetypeSlug, ReactNode>);
+  // Handle mouse movement
+  const handleMouseMove = (e: { clientX: number; clientY: number; }) => {
+    if (cardRef.current && lettersRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      lettersRef.current?.style.setProperty("--x", `${x}px`);
+      lettersRef.current?.style.setProperty("--y", `${y}px`);
+
+      // Only update text when hovering to avoid unnecessary re-renders
+      if (isHovering) {
+        lettersRef.current.innerText = generateRandomChars(charLength);
+      }
+    }
+  };
+
+  // Handle touch movement
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches && e.touches[0]) {
+      handleMouseMove(e.touches[0]);
+    }
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      className={`relative ${width} ${height} rounded-xl ${bgColor} overflow-hidden cursor-pointer ${className}`}
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      style={{
+        '--card-size': cardSize,
+        '--font-size': fontSize,
+        '--background-light-rgb': bgLightColor,
+        '--plebs-main-rgb': mainColor,
+        '--plebs-main-light-rgb': mainLightColor,
+        '--plebs-secondary-rgb': secondaryColor,
+      } as React.CSSProperties}
+    >
+
+      {/* Agent silhouette overlay */}
+      <div className={`mix-blend-multiply absolute top-[20%] left-0 w-full h-full pointer-events-none z-10 transition-opacity ${isHovering ? 'opacity-60 duration-500' : 'opacity-0'}`}>
+        <svg viewBox="0 0 474 1282" fill={`${mainColor}`} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+          <g filter="url(#filter0_f_6389_38)">
+            <path d="M133.549 248.953C126.237 148.701 171.568 47.2534 281.78 50.0568L283.068 50.0939C392.306 53.6693 432.06 156.871 419.708 256.233C408.868 343.433 368.415 387.712 331.152 408.793C322.205 418.886 316.701 432.818 316.701 453.742C316.701 548.41 342.415 530.768 404.5 662.443C446.787 752.128 401.904 1082.52 416 1232H50C96.9856 1037.68 -19.7033 679.882 133 545.354C193.838 491.757 207.726 438.237 198.925 394.675C167.967 369.003 139.04 324.239 133.549 248.953Z" />
+          </g>
+          <defs>
+            <filter id="filter0_f_6389_38" x="0" y="0" width="473.146" height="1282" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+              <feFlood floodOpacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="25" result="effect1_foregroundBlur_6389_38" />
+            </filter>
+          </defs>
+        </svg>
+        </div>
+
+      {/* Gradient overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-10 mix-blend-darken"
+        style={{
+          background: 'radial-gradient(transparent 0%, var(--plebs-main-rgb) 50%, rgb(var(--plebs-main-light-rgb)), rgb(var(--plebs-secondary-rgb)))'
+        }}
+      />
+
+      {/* Text with mask effect */}
+      <div
+        ref={lettersRef}
+        className={`absolute inset-0 text-white text-xs font-medium break-words transition-opacity duration-400 scale-103 ${isHovering ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          '--x': '0px',
+          '--y': '0px',
+          WebkitMaskImage: 'radial-gradient(calc(var(--card-size) * 0.8) circle at var(--x) var(--y), rgb(255 255 255) 20%, rgb(255 255 255 / 25%), transparent)',
+          maskImage: 'radial-gradient(calc(var(--card-size) * 0.8) circle at var(--x) var(--y), rgb(255 255 255) 20%, rgb(255 255 255 / 25%), transparent)',
+          transform: 'scale(1.03)',
+        } as React.CSSProperties}
+      />
+
+      {/* Card content area */}
+      <div className="relative z-20 h-full w-full p-4">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default ArchetypeCardEffect;

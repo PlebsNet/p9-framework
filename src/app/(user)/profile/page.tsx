@@ -21,26 +21,16 @@ export default async function ProfilePage() {
 
   const userId = session.user.id;
 
-  // 2) Load user row (to get ethAddress) and assessments in parallel
-  const [user, assessments] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        email: true,
-        ethAddress: true,
-      },
-    }),
-    prisma.assessment.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        archetype: true,
-        answers: true,
-        createdAt: true,
-      },
-    }),
-  ]);
+  const assessments = await prisma.assessment.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      archetype: true,
+      answers: true,
+      createdAt: true,
+    },
+  });
 
   // 3) Serialize assessments for the client
   const assessmentsForClient = assessments.map(a => ({
@@ -51,7 +41,7 @@ export default async function ProfilePage() {
   }));
 
   // 4) Pick the latest one to show summary
-  const latest = assessments[0] ?? null;
+  const latest = assessments.length > 0 ? assessments[0] : null;
 
   // 5) Precompute chart & profile for the latest
   let dimData: { dimension: Dimension; score: number }[] = [];

@@ -34,10 +34,6 @@ export const ARCH_CLUSTER: Record<ArchetypeSlug, keyof typeof CLUSTER_COLOR> = {
   investigator: "enabler",
 };
 
-// Silhouette outline (simplified head+shoulders)
-const SILHOUETTE_PATH =
-  "M32 4C21 4 12 12 12 23v18c0 11 9 19 20 19s20-8 20-19V23c0-11-9-19-20-19z";
-
 // Signature shapes
 function Signature({ slug }: { slug: ArchetypeSlug }) {
   const color = CLUSTER_COLOR[ARCH_CLUSTER[slug]];
@@ -128,8 +124,6 @@ function Signature({ slug }: { slug: ArchetypeSlug }) {
 // Build the final SVG for each slug
 export const ArchetypeAvatars: Record<ArchetypeSlug, ReactNode> =
   (Object.keys(ARCH_CLUSTER) as ArchetypeSlug[]).reduce((acc, slug) => {
-    const color = CLUSTER_COLOR[ARCH_CLUSTER[slug]];
-
     acc[slug] = (
       <svg
         key={slug}
