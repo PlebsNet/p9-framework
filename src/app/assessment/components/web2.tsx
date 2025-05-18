@@ -7,8 +7,6 @@ import { nanoid } from "nanoid";
 import { track } from "@vercel/analytics";
 import Question from "./Question";
 import { questions } from "./questions";
-import DynamicGraph from "@/components/ForceGraph3D";
-import { useContainerSize } from '@/hooks/useContainerSize';
 
 const ANIM = { duration: 0.3 };
 const STORAGE_ANS = "plebs_answers";
@@ -18,8 +16,6 @@ const STORAGE_TEST = "plebs_testId";
 export default function Web2Assessment() {
     const router = useRouter();
     const total = questions.length;
-    const { containerRef, dimensions } = useContainerSize();
-
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,22 +112,6 @@ export default function Web2Assessment() {
                     {formError}
                 </p>
             )}
-
-            <div className="mb-8 h-[200px] w-full relative overflow-hidden rounded-lg">
-                <div
-                    ref={containerRef}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        position: 'relative'
-                    }}
-                >
-                    <DynamicGraph
-                        width={dimensions.width}
-                        height={dimensions.height}
-                    />
-                </div>
-            </div>
 
             <AnimatePresence initial={false}>
                 {visible

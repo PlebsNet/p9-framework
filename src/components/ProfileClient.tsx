@@ -55,7 +55,7 @@ export default function ProfileClient({
     : [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 flex flex-col gap-4">
       {primary && (primary.slug as keyof typeof ArchetypeAvatars) in ArchetypeAvatars && (
         <div className="flex items-start space-x-4">
           <div className="text-4xl">{ArchetypeAvatars[primary.slug as keyof typeof ArchetypeAvatars]}</div>
@@ -82,7 +82,7 @@ export default function ProfileClient({
       )}
 
       {primary && (
-        <p className="text-sm text-gray-500 italic mt-2">
+        <p className="text-sm text-gray-500 italic mt-2 ">
           You scored highly in {primary.primaryTraits?.slice(0, 2).join(" and ")}, aligning you with the <strong>{primary.name}</strong> archetype.
         </p>
       )}
@@ -98,7 +98,7 @@ export default function ProfileClient({
         showTooltip
       />
 
-      <div className="space-y-1 text-sm text-gray-600">
+      <div className="bg-gray-800 rounded-lg p-6 shadow-sm space-y-1 text-sm text-gray-600">
         <h4 className="font-semibold">Top Traits</h4>
         {[...dimData]
           .sort((a, b) => scaleScoreTo100(b.score) - scaleScoreTo100(a.score))
@@ -114,10 +114,11 @@ export default function ProfileClient({
       </div>
 
       {selectedTrait && (
-        <div className="mt-6">
-          <h4 className="text-sm font-semibold text-gray-600 mb-2">
+        <div className="mt-6 flex flex-col gap-4">
+          <div className="space-y-2 bg-gray-800 rounded-lg p-6 shadow-sm flex flex-col gap-4">
+          <h3 className="text-sm font-semibold text-gray-600 mb-2">
             Track a Trait Over Time
-          </h4>
+          </h3>
           <select
             value={selectedTrait}
             onChange={(e) => setSelectedTrait(e.target.value as Dimension)}
@@ -145,11 +146,11 @@ export default function ProfileClient({
               />
             </LineChart>
           </ResponsiveContainer>
-
+          </div>
           {assessments.length > 1 && (
-            <div className="text-sm text-gray-600 space-y-2">
+            <div className="space-y-2 bg-gray-800 rounded-lg p-6 shadow-sm flex flex-col gap-4">
               <div>
-                <h4 className="font-semibold">Your archetype journey</h4>
+                <h3 className="font-semibold">Your archetype journey</h3>
                 <p>{assessments.map((a) => a.archetype).join(" → ")}</p>
               </div>
               <div>

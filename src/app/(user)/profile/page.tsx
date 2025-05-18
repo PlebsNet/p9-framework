@@ -21,26 +21,16 @@ export default async function ProfilePage() {
 
   const userId = session.user.id;
 
-  // 2) Load user row (to get ethAddress) and assessments in parallel
-  const [, assessments] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        email: true,
-        ethAddress: true,
-      },
-    }),
-    prisma.assessment.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        archetype: true,
-        answers: true,
-        createdAt: true,
-      },
-    }),
-  ]);
+  const assessments = await prisma.assessment.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      archetype: true,
+      answers: true,
+      createdAt: true,
+    },
+  });
 
   // 3) Serialize assessments for the client
   const assessmentsForClient = assessments.map(a => ({
@@ -51,7 +41,7 @@ export default async function ProfilePage() {
   }));
 
   // 4) Pick the latest one to show summary
-  const latest = assessments[0] ?? null;
+  const latest = assessments.length > 0 ? assessments[0] : null;
 
   // 5) Precompute chart & profile for the latest
   let dimData: { dimension: Dimension; score: number }[] = [];
@@ -69,23 +59,33 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Your Profile</h1>
-      <p className="text-sm text-blue-500 underline mb-4">
-        <Link href="/assessment">Retake test</Link>
-      </p>
+    <div className="max-w-4xl mx-auto p-6 md:py-16 space-y-12">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">Your Personality Profile</h1>
+        <Link
+          href="/assessment"
+          className="inline-block text-sm text-primary underline hover:text-primary/80 transition"
+        >
+          Retake the assessment
+        </Link>
+      </div>
 
       {latest ? (
-        <ProfileClient
-          dimData={dimData}
-          primary={primary}
-          assessments={assessmentsForClient}
-        />
+        <div className="bg-gray-900 rounded-lg p-6 shadow-sm">
+          <ProfileClient
+            dimData={dimData}
+            primary={primary}
+            assessments={assessmentsForClient}
+          />
+        </div>
       ) : (
-        <p>You haven’t taken a test yet.</p>
+        <p className="text-muted-foreground">You haven’t taken a test yet.</p>
       )}
 
-      <HistoryTable assessments={assessmentsForClient} />
+      <div className="bg-gray-900 rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">Past Assessments</h2>
+        <HistoryTable assessments={assessmentsForClient} />
+      </div>
     </div>
   );
 }

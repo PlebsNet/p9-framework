@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCsrfToken, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { cbWalletConnector } from "@/lib/wagmiConfig";
+import { toast } from "sonner";
+import { Button } from './ui/Button';
 
 interface ConnectAndSIWEProps {
   onConnectChange?: (connected: boolean) => void;
@@ -41,7 +43,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   };
 
   // Handle SIWE sign-in
-  const handleSignIn = useCallback(async () => {
+  const handleSignIn = async () => {
     try {
       setIsLoading(true);
       setError('');
@@ -113,7 +115,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
       setProcessingStep('');
       setShouldSignIn(false);
     }
-  }, [isConnected, address, signMessageAsync]);
+  };
 
   // Automatically trigger sign-in when wallet connection completes
   useEffect(() => {
@@ -126,7 +128,13 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isConnected, address, shouldSignIn, handleSignIn]);
+  }, [isConnected, address, shouldSignIn]);
+
+  useEffect(() => {
+    if (processingStep) {
+      toast(processingStep);
+    }
+  }, [processingStep]);
 
   // Trigger the "connect wallet" flow, which will then trigger sign-in
   const handleConnectAndSignIn = () => {
@@ -135,31 +143,27 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       {!isConnected ? (
         // Not connected - show the connect button
-        <button
+        <Button
+          size="lg"
           onClick={handleConnectAndSignIn}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           disabled={isLoading}
+          className="w-full text-md bg-[#0052ff] text-gray-50"
         >
-          {isLoading ? 'Connecting...' : 'Connect & Sign In'}
-        </button>
+          {isLoading ? 'Connecting...' : 'Connect with Base'}
+        </Button>
       ) : (
-        // Already connected - show sign in button
-        <button
+        // Already connected - show fallback sign in button for Next Auth
+        <Button
+          size="xl"
           onClick={handleSignIn}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           disabled={isLoading}
+            className="w-full text-md bg-[#0052ff] text-gray-50"
         >
-          {isLoading ? 'Signing in...' : 'Sign in with Ethereum'}
-        </button>
-      )}
-
-      {processingStep && (
-        <div className="mt-2 text-sm text-blue-600">
-          {processingStep}
-        </div>
+          {isLoading ? 'Signing in...' : 'Sign in with Base'}
+        </Button>
       )}
 
       {error && (
@@ -168,11 +172,11 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
         </div>
       )}
 
-      {isConnected && address && !isLoading && (
+      {/* {isConnected && address && !isLoading && (
         <div className="mt-2 text-sm text-gray-600">
           Connected: {address}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

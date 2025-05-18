@@ -15,14 +15,14 @@ export type ArchetypeSlug =
   | "integrator";
 
 // Cluster colors (as literal)
-const CLUSTER_COLOR = {
+export const CLUSTER_COLOR = {
   explorer: "#65E2E2",
   executor: "#E2B865",
   enabler: "#E265E2",
 } as const;
 
 // Assign each archetype to a cluster
-const ARCH_CLUSTER: Record<ArchetypeSlug, keyof typeof CLUSTER_COLOR> = {
+export const ARCH_CLUSTER: Record<ArchetypeSlug, keyof typeof CLUSTER_COLOR> = {
   visionary: "explorer",
   innovator: "explorer",
   integrator: "explorer",
@@ -33,10 +33,6 @@ const ARCH_CLUSTER: Record<ArchetypeSlug, keyof typeof CLUSTER_COLOR> = {
   mediator: "enabler",
   investigator: "enabler",
 };
-
-// Silhouette outline (simplified head+shoulders)
-const SILHOUETTE_PATH =
-  "M32 4C21 4 12 12 12 23v18c0 11 9 19 20 19s20-8 20-19V23c0-11-9-19-20-19z";
 
 // Signature shapes
 function Signature({ slug }: { slug: ArchetypeSlug }) {
@@ -128,44 +124,12 @@ function Signature({ slug }: { slug: ArchetypeSlug }) {
 // Build the final SVG for each slug
 export const ArchetypeAvatars: Record<ArchetypeSlug, ReactNode> =
   (Object.keys(ARCH_CLUSTER) as ArchetypeSlug[]).reduce((acc, slug) => {
-    const color = CLUSTER_COLOR[ARCH_CLUSTER[slug]];
-
     acc[slug] = (
       <svg
         key={slug}
         viewBox="0 0 64 64"
-        className="w-12 h-12 overflow-visible"
-        preserveAspectRatio="xMidYMid meet"
+        className="w-full h-full"
       >
-        <defs>
-          <filter
-            id={`blur-${slug}`}
-            x="-50%"
-            y="-50%"
-            width="200%"
-            height="200%"
-          >
-            <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
-          </filter>
-        </defs>
-
-        <ellipse
-          cx="32"
-          cy="32"
-          rx="30"
-          ry="28"
-          fill={color}
-          filter={`url(#blur-${slug})`}
-          transform="rotate(-10 32 32)"
-        />
-
-        <path
-          d={SILHOUETTE_PATH}
-          fill="#FFF"
-          stroke={color}
-          strokeWidth={3}
-        />
-
         <Signature slug={slug} />
       </svg>
     );

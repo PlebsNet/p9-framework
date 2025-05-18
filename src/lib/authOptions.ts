@@ -8,6 +8,12 @@ import prisma from "@/lib/prisma";
 import { SiweMessage } from "siwe";
 import { cookies } from "next/headers";
 
+// Define extended user type for TypeScript safety
+interface ExtendedUser extends User {
+  ethAddress?: string;
+  role: "USER" | "ADMIN";
+}
+
 // Fallback error handling for missing Google env vars
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   throw new Error("Missing Google OAuth environment variables.");
@@ -30,7 +36,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(
         credentials: Record<"message" | "signature", string> | undefined
-      ): Promise<User | null> {
+      ): Promise<ExtendedUser | null> {
         try {
           if (!credentials?.message || !credentials?.signature) {
             return null;
@@ -54,24 +60,21 @@ export const authOptions: NextAuthOptions = {
           const nonce = nonceCookie?.value;
 
           if (!nonce) {
-            console.warn(
-              "❌ Missing nonce cookie - this must be set before authorization"
-            );
+            console.warn("❌ Missing nonce cookie - this must be set before authorization");
             return null;
           }
 
           // Skip domain verification in development
-          const options =
-            process.env.NODE_ENV === "development"
-              ? {
-                  signature: credentials.signature,
-                  nonce: nonce,
-                }
-              : {
-                  signature: credentials.signature,
-                  domain: parsedMessage.domain,
-                  nonce: nonce,
-                };
+          const options = process.env.NODE_ENV === "development"
+            ? {
+              signature: credentials.signature,
+              nonce: nonce
+            }
+            : {
+              signature: credentials.signature,
+              domain: parsedMessage.domain,
+              nonce: nonce
+            };
 
           console.log("Using verification options:", options);
 
@@ -83,7 +86,7 @@ export const authOptions: NextAuthOptions = {
           const address = getAddress(siwe.address);
 
           // Find existing user by Ethereum address
-          let user = await prisma.user.findFirst({
+          let user = await prisma.user.findUnique({
             where: { ethAddress: address },
           });
 
@@ -122,13 +125,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       try {
+
         const email = user.email;
-        const ethAddress = user.ethAddress;
+        const ethAddress = (user as ExtendedUser).ethAddress;
 
         if (!email && !ethAddress) {
-          console.warn(
-            "🧨 [signIn] Missing both email and ethAddress — rejecting sign-in"
-          );
+          console.warn("🧨 [signIn] Missing both email and ethAddress — rejecting sign-in");
           return false;
         }
 
@@ -149,8 +151,7 @@ export const authOptions: NextAuthOptions = {
 
         if (existingUser) {
           const needsUpdate =
-            (!existingUser.email && email) ||
-            (!existingUser.ethAddress && ethAddress);
+            (!existingUser.email && email) || (!existingUser.ethAddress && ethAddress);
 
           if (needsUpdate) {
             await prisma.user.update({
@@ -162,7 +163,7 @@ export const authOptions: NextAuthOptions = {
             });
           }
         }
-
+  
         return true;
       } catch (error) {
         console.error("❌ signIn error:", error);
@@ -173,11 +174,11 @@ export const authOptions: NextAuthOptions = {
       // When a user signs in, add their data to the token
       if (user) {
         token.sub = user.id;
-        token.email = user.email ?? null;
-        token.name = user.name ?? null;
-        token.picture = user.image ?? null;
-        token.ethAddress = user.ethAddress ?? null;
-        token.role = user.role;
+        token.email = user.email ?? undefined;
+        token.name = user.name ?? undefined;
+        token.picture = user.image ?? undefined;
+        token.ethAddress = (user as ExtendedUser).ethAddress ?? undefined;
+        token.role = (user as ExtendedUser).role ?? undefined;
       }
 
       // Include the sign-in provider if available
@@ -191,12 +192,11 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token.sub) {
         // Transfer data from token to session
         session.user.id = token.sub;
-        session.user.email = token.email || undefined;
-        session.user.name = token.name || undefined;
-        session.user.image = token.picture || undefined;
-        session.user.ethAddress =
-          typeof token.ethAddress === "string" ? token.ethAddress : undefined;
-        session.user.role = token.role as "USER" | "ADMIN";
+        session.user.email = token.email ?? undefined;
+        session.user.name = token.name ?? undefined;
+        session.user.image = token.picture ?? undefined;
+        (session.user as ExtendedUser).ethAddress = token.ethAddress as string | undefined;
+        (session.user as ExtendedUser).role = (token.role as "USER" | "ADMIN") ?? "USER";
       }
 
       return session;
@@ -204,6 +204,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/auth/signin",

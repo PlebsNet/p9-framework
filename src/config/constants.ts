@@ -1,7 +1,10 @@
+import React from "react";
+import { Discord, X , Github } from "@/components/Icons";
+
 export interface SocialLink {
   name: 'X' | 'Discord' | 'Github' | 'Forum' | 'Youtube' | 'LinkedIn' | 'Facebook' | "Docs";
   url: string;
-  icon: string;
+  icon: React.ComponentType;
   handle: string;
 }
 
@@ -36,7 +39,7 @@ export const meta: MetaConfig = {
   url: 'https://plebs.net',
   canonical: 'hhttps://plebs.net',
   name: 'Plebs',
-  title: 'P9 Framework',
+  title: 'Plebs Framework',
   description: 'Discover the P in Personality',
   themeColor: '#000000',
   icons: {
@@ -57,37 +60,19 @@ export const meta: MetaConfig = {
     {
       name: "X",
       url: "https://x.com/plebsnet",
-      icon: "@",
+      icon: X,
       handle: "plebsnet",
     },
     {
       name: "Discord",
       url: "https://discord.gg/vB5f5svsee",
-      icon: "/",
+      icon: Discord,
       handle: "plebsnet",
     },
     {
       name: "Github",
       url: "https://github.com/plebsnet",
-      icon: "@",
-      handle: "plebsnet",
-    },
-    {
-      name: "Youtube",
-      url: "https://www.youtube.com/@plebsnet",
-      icon: "@",
-      handle: "plebsnet",
-    },
-    {
-      name: "LinkedIn",
-      url: "https://www.linkedin.com/company/plebsnet/",
-      icon: "@",
-      handle: "plebsnet",
-    },
-    {
-      name: "Facebook",
-      url: "https://www.facebook.com/plebsnet/",
-      icon: "@",
+      icon: Github,
       handle: "plebsnet",
     },
   ],

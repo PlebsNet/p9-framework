@@ -80,7 +80,7 @@ export default function Web3Assessment() {
         if (!positionsData?.triples || !address) return;
 
         const newAnswers: Record<string, number> = {};
-        let firstUnansweredIndex = 0;
+        let firstUnansweredIndex = -1;
 
         questions.forEach((question, index) => {
             const position = positionsData.triples.find(
@@ -96,16 +96,19 @@ export default function Web3Assessment() {
                 else if (position.counter_vault?.positions?.[0]?.shares > 0) {
                     newAnswers[question.id] = 1; // Strongly Disagree
                 }
-            } else {
+            } else if (firstUnansweredIndex === -1) {
                 // If this is the first unanswered question, set it as current
-                if (firstUnansweredIndex === 0) {
-                    firstUnansweredIndex = index;
-                }
+                firstUnansweredIndex = index;
             }
         });
 
         setAnswers(newAnswers);
-        setCurrentIndex(firstUnansweredIndex);
+        if (firstUnansweredIndex === -1) {
+            // All questions answered
+            setCurrentIndex(questions.length - 1);
+        } else {
+            setCurrentIndex(firstUnansweredIndex);
+        }
     }, [positionsData, address]);
 
     // Process transaction queue
@@ -195,10 +198,17 @@ export default function Web3Assessment() {
         if (typeof window === "undefined" || !address) return;
         try {
             const a = sessionStorage.getItem(STORAGE_ANS);
-            if (a) setAnswers(JSON.parse(a));
-            const idx = parseInt(sessionStorage.getItem(STORAGE_IDX) || "", 10);
-            if (!isNaN(idx) && idx >= 0 && idx < total) {
-                setCurrentIndex(idx);
+            if (a) {
+                const parsedAnswers = JSON.parse(a);
+                setAnswers(parsedAnswers);
+                // Find the first unanswered question
+                const firstUnansweredIndex = questions.findIndex(q => parsedAnswers[q.id] === undefined);
+                if (firstUnansweredIndex !== -1) {
+                    setCurrentIndex(firstUnansweredIndex);
+                } else {
+                    // If all questions are answered, set to the last question
+                    setCurrentIndex(questions.length - 1);
+                }
             }
         } catch { }
     }, [total, address]);
@@ -228,11 +238,9 @@ export default function Web3Assessment() {
             setAnswers((prev) => ({ ...prev, [id]: value }));
             const idx = questions.findIndex((q) => q.id === id);
 
-            // Advance to next question immediately, synchronously
             if (idx === currentIndex && currentIndex < total - 1) {
-                flushSync(() => {
-                    setCurrentIndex(idx + 1);
-                });
+                // Advance to next question immediately
+                setCurrentIndex(idx + 1);
             }
 
             // Add transaction to queue
@@ -291,17 +299,17 @@ export default function Web3Assessment() {
         [answers, router, total, address]
     );
 
-    const visible = questions.slice(0, currentIndex + 1);
+
+
     const allAnswered = Object.keys(answers).length === total;
     const answeredCount = Object.keys(answers).length;
     const remainingCount = total - answeredCount;
+    const visible = questions.slice(0, answeredCount);
+
 
     return (
         <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">Web3 Personality Assessment</h2>
-            <p className="text-sm text-gray-600 mb-4">
-                Connected wallet: {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}
-            </p>
 
             {currentChainId !== 84532 && (
                 <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-md text-yellow-500 text-sm">
@@ -312,98 +320,94 @@ export default function Web3Assessment() {
                 </div>
             )}
 
-            {isLoadingPositions ? (
-                <div className="text-center py-8">
-                    <p className="text-gray-600">Loading your previous answers...</p>
+
+            <div className="flex justify-between items-center mb-6">
+                <div className="text-sm text-gray-600">
+                    <p>{answeredCount} question{answeredCount !== 1 ? 's' : ''} already replied</p>
+                    <p>{remainingCount} / {total} question{remainingCount !== 1 ? 's' : ''} left</p>
                 </div>
-            ) : (
-                <>
-                    <div className="flex justify-between items-center mb-6">
-                        <div className="text-sm text-gray-600">
-                            <p>{answeredCount} question{answeredCount !== 1 ? 's' : ''} already replied</p>
-                            <p>{remainingCount} / {total} question{remainingCount !== 1 ? 's' : ''} left</p>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={!allAnswered || isSubmitting || !address}
-                            className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-gray-300 disabled:text-gray-600 transition-opacity"
-                        >
-                            {isSubmitting ? "Submitting..." : "Submit Answers"}
-                        </button>
-                    </div>
+                <button
+                    type="submit"
+                    disabled={!allAnswered || isSubmitting || !address}
+                    className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-gray-300 disabled:text-gray-600 transition-opacity"
+                >
+                    {isSubmitting ? "Submitting..." : "Submit Answers"}
+                </button>
+            </div>
 
-                    {formError && (
-                        <p className="mb-4 text-red-600" role="alert">
-                            {formError}
-                        </p>
-                    )}
+            {formError ? (
+                <p className="mb-4 text-red-600" role="alert">
+                    {formError}
+                </p>
+            ) : null}
 
-                    <div className="mb-8 h-[200px] w-full relative overflow-hidden rounded-lg">
-                        <div
-                            ref={containerRef}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                position: 'relative'
-                            }}
-                        >
-                            <DynamicGraph
-                                width={dimensions.width}
-                                height={dimensions.height}
-                            />
-                        </div>
-                    </div>
+            <div className="mb-8 h-[200px] w-full relative overflow-hidden rounded-lg">
+                <div
+                    ref={containerRef}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        position: 'relative'
+                    }}
+                >
+                    <DynamicGraph
+                        width={dimensions.width}
+                        height={dimensions.height}
+                    />
+                </div>
+            </div>
 
-                    <AnimatePresence initial={false}>
-                        {visible
-                            .slice()
-                            .reverse()
-                            .map((q, revIdx) => {
-                                const idx = visible.length - 1 - revIdx;
-                                const isActive = idx === currentIndex;
-                                const txStatus = transactionStatuses[q.id];
-                                const isAnswered = answers[q.id] !== undefined;
+            <AnimatePresence initial={false}>
+                {visible
+                    .slice()
+                    .reverse()
+                    .map((q, revIdx) => {
+                        const idx = visible.length - 1 - revIdx;
+                        const isActive = idx === currentIndex;
+                        const txStatus = transactionStatuses[q.id];
+                        const isAnswered = answers[q.id] !== undefined;
 
-                                return (
-                                    <motion.div
-                                        key={q.id}
-                                        initial={{ y: isActive ? -10 : 0, opacity: isActive ? 1 : 0.6 }}
-                                        animate={{ y: 0, opacity: isActive ? 1 : 0.5 }}
-                                        exit={{ y: 10, opacity: 0 }}
-                                        transition={ANIM}
-                                        className={`${isActive ? "mb-8" : "mb-4"} ${isAnswered ? "opacity-75" : ""}`}
-                                    >
-                                        <Question
-                                            id={q.id}
-                                            text={q.text}
-                                            value={answers[q.id] ?? 0}
-                                            onChange={handleAnswerChange}
-                                            isLoading={txStatus?.status === 'pending'}
-                                            isSuccess={txStatus?.status === 'success'}
-                                            isAnswered={isAnswered}
-                                            explorerButton={
-                                                txStatus?.status === 'success' && txStatus.txHash && (
-                                                    <button
-                                                        type="button"
-                                                        className="flex items-center gap-1 px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition text-xs"
-                                                        onClick={() => window.open(`${BLOCK_EXPLORER_URL}/tx/${txStatus.txHash}`, '_blank')}
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link" viewBox="0 0 24 24">
-                                                            <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                                            <polyline points="15 3 21 3 21 9" />
-                                                            <line x1="10" x2="21" y1="14" y2="3" />
-                                                        </svg>
-                                                        Explorer
-                                                    </button>
-                                                )
-                                            }
-                                        />
-                                    </motion.div>
-                                );
-                            })}
-                    </AnimatePresence>
-                </>
-            )}
+                        return (
+                            <motion.div
+                                key={q.id}
+                                initial={{ y: isActive ? -10 : 0, opacity: isActive ? 1 : 0.6 }}
+                                animate={{ y: 0, opacity: isActive ? 1 : 0.5 }}
+                                exit={{ y: 10, opacity: 0 }}
+                                transition={ANIM}
+                                className={`${isActive ? "mb-8" : "mb-4"} ${isAnswered ? "opacity-75" : ""}`}
+                            >
+                                <Question
+                                    id={q.id}
+                                    text={q.text}
+                                    value={answers[q.id] ?? 0}
+                                    onChange={handleAnswerChange}
+                                    isLoading={txStatus?.status === 'pending'}
+                                    isSuccess={txStatus?.status === 'success'}
+                                    isAnswered={isAnswered}
+                                    explorerButton={
+                                        txStatus?.status === 'success' && txStatus.txHash && (
+                                            <button
+                                                type="button"
+                                                className="flex items-center gap-1 px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition text-xs"
+                                                onClick={() => window.open(`${BLOCK_EXPLORER_URL}/tx/${txStatus.txHash}`, '_blank')}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link" viewBox="0 0 24 24">
+                                                    <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                                    <polyline points="15 3 21 3 21 9" />
+                                                    <line x1="10" x2="21" y1="14" y2="3" />
+                                                </svg>
+                                                Explorer
+                                            </button>
+                                        )
+                                    }
+                                />
+                            </motion.div>
+                        );
+                    })}
+
+            </AnimatePresence>
+
         </form>
-    );
+
+    )
 } 
