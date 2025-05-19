@@ -114,7 +114,7 @@ export default function Web3Assessment() {
     // Process transaction queue
     useEffect(() => {
         const processQueue = async () => {
-            if (isProcessingQueue || pendingTransactions.length === 0 || !address) return;
+            if (isProcessingQueue || pendingTransactions.length === 0 || !address || !positionsData?.triples) return;
 
             setIsProcessingQueue(true);
             const currentTx = pendingTransactions[0];
@@ -148,11 +148,20 @@ export default function Web3Assessment() {
             );
 
             try {
+                // Find the triple in positionsData to get the correct vault ID
+                const triple = positionsData.triples.find(t => t.id === currentTx.tripleId.toString());
+                if (!triple) {
+                    throw new Error('Triple not found in positions data');
+                }
+
+                // Get the correct vault ID based on the answer
+                const vaultId = answer <= 3 ? BigInt(triple.counter_vault_id) : BigInt(triple.vault_id);
+
                 const hash = await writeContractAsync({
                     address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
                     abi: multivaultAbi as Abi,
                     functionName: 'depositTriple',
-                    args: [address as `0x${string}`, BigInt(currentTx.tripleId)],
+                    args: [address as `0x${string}`, vaultId],
                     value: depositAmount,
                     chain: baseSepolia
                 });
@@ -191,7 +200,7 @@ export default function Web3Assessment() {
         };
 
         processQueue();
-    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt, answers, minDeposit]);
+    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt, answers, minDeposit, positionsData]);
 
     // Hydrate once on mount (fire-and-forget)
     useEffect(() => {
