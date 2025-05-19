@@ -90,11 +90,27 @@ export default function Web3Assessment() {
             if (position) {
                 // If user has shares in vault, they agreed
                 if (position.vault?.positions?.[0]?.shares > 0) {
-                    newAnswers[question.id] = 7; // Strongly Agree
+                    let shares = Number(position.vault?.positions?.[0]?.shares);
+                    console.log("Shares", shares);
+                    if (shares > 0) { // 612202501000000
+                        newAnswers[question.id] = 5; // Slightly Agree
+                    } if (shares > 1000000000000000) { // 1224405001000000
+                        newAnswers[question.id] = 6; // Agree
+                    } if (shares > 1600000000000000) { // 1836607501000000
+                        newAnswers[question.id] = 7; // Strongly Agree
+                    }
                 }
                 // If user has shares in counter vault, they disagreed
                 else if (position.counter_vault?.positions?.[0]?.shares > 0) {
-                    newAnswers[question.id] = 1; // Strongly Disagree
+                    let shares = Number(position.counter_vault?.positions?.[0]?.shares);
+                    console.log("Shares", shares);
+                    if (shares > 0) { // 612202501000000
+                        newAnswers[question.id] = 3; // Slightly Disagree
+                    } if (shares > 1000000000000000) { // 1224405001000000
+                        newAnswers[question.id] = 2; // Disagree
+                    } if (shares > 1600000000000000) { // 1836607501000000
+                        newAnswers[question.id] = 1; // Strongly Disagree
+                    }
                 }
             } else if (firstUnansweredIndex === -1) {
                 // If this is the first unanswered question, set it as current
