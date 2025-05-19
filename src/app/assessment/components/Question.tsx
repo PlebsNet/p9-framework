@@ -10,6 +10,7 @@ export interface QuestionProps {
   onChange: (id: string, value: number) => void;
   isLoading?: boolean;
   isSuccess?: boolean;
+  isAnswered?: boolean;
   explorerButton?: React.ReactNode;
 }
 
@@ -28,8 +29,9 @@ export default function Question({
   text,
   value,
   onChange,
-  isLoading,
-  isSuccess,
+  isLoading = false,
+  isSuccess = false,
+  isAnswered = false,
   explorerButton,
 }: QuestionProps) {
   // Treat 0 as "no selection"
@@ -59,7 +61,7 @@ export default function Question({
               htmlFor={`${id}-${t.value}`}
               className="flex flex-col items-center cursor-pointer"
             >
-              {isSuccess && value === t.value ? (
+              {(isSuccess && value === t.value) || (isAnswered && value === t.value) ? (
                 <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-green-500" />
               ) : isLoading && value === t.value ? (
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />

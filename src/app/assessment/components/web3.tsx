@@ -12,10 +12,14 @@ import { useContainerSize } from '@/hooks/useContainerSize';
 import { useAccount, useChainId } from 'wagmi';
 import { useDepositTriple } from '@/hooks/useDepositTriple';
 import { MULTIVAULT_CONTRACT_ADDRESS, BLOCK_EXPLORER_URL } from '@/config/blockchain';
-import { parseUnits } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
 import { Abi } from 'viem';
 import { multivaultAbi } from '@/lib/abis/multivault';
 import { baseSepolia } from 'viem/chains';
+import { flushSync } from "react-dom";
+import { useMultivaultContract } from '@/hooks/useMultivaultContract';
+import { useContractRead } from 'wagmi';
+import { useGetTriplesWithPositionsQuery } from '@0xintuition/graphql';
 
 const ANIM = { duration: 0.3 };
 const STORAGE_ANS = "plebs_answers_web3";
@@ -31,6 +35,7 @@ interface TransactionStatus {
 interface PendingTransaction {
     questionId: string;
     tripleId: number;
+    answer: number;
 }
 
 export default function Web3Assessment() {
@@ -44,6 +49,24 @@ export default function Web3Assessment() {
         onReceipt
     } = useDepositTriple(MULTIVAULT_CONTRACT_ADDRESS);
 
+    // Get minimum deposit amount from contract
+    const { data: generalConfig } = useContractRead({
+        address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
+        abi: multivaultAbi as Abi,
+        functionName: 'generalConfig',
+        chainId: baseSepolia.id,
+    }) as { data: [string, string, bigint, bigint, bigint, bigint, bigint, bigint] | undefined };
+
+    const minDeposit = generalConfig ? formatUnits(generalConfig[3], 18) : '0.001';
+
+    // Get positions for all triples
+    const { data: positionsData, isLoading: isLoadingPositions } = useGetTriplesWithPositionsQuery({
+        where: {
+            id: { _in: questions.map(q => q.triple.id) }
+        },
+        address: address?.toLowerCase() as `0x${string}`
+    });
+
     const [answers, setAnswers] = useState<Record<string, number>>({});
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,21 +75,110 @@ export default function Web3Assessment() {
     const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
     const [isProcessingQueue, setIsProcessingQueue] = useState(false);
 
+    // Initialize answers based on positions
+    useEffect(() => {
+        if (!positionsData?.triples || !address) return;
+
+        const newAnswers: Record<string, number> = {};
+        let firstUnansweredIndex = -1;
+
+        questions.forEach((question, index) => {
+            const position = positionsData.triples.find(
+                (p: { id: number }) => p.id == question.triple.id
+            );
+
+            if (position) {
+                // If user has shares in vault, they agreed
+                if (position.vault?.positions?.[0]?.shares > 0) {
+                    let shares = Number(position.vault?.positions?.[0]?.shares);
+                    console.log("Shares", shares);
+                    if (shares > 0) { // 612202501000000
+                        newAnswers[question.id] = 5; // Slightly Agree
+                    } if (shares > 1000000000000000) { // 1224405001000000
+                        newAnswers[question.id] = 6; // Agree
+                    } if (shares > 1600000000000000) { // 1836607501000000
+                        newAnswers[question.id] = 7; // Strongly Agree
+                    }
+                }
+                // If user has shares in counter vault, they disagreed
+                else if (position.counter_vault?.positions?.[0]?.shares > 0) {
+                    let shares = Number(position.counter_vault?.positions?.[0]?.shares);
+                    console.log("Shares", shares);
+                    if (shares > 0) { // 612202501000000
+                        newAnswers[question.id] = 3; // Slightly Disagree
+                    } if (shares > 1000000000000000) { // 1224405001000000
+                        newAnswers[question.id] = 2; // Disagree
+                    } if (shares > 1600000000000000) { // 1836607501000000
+                        newAnswers[question.id] = 1; // Strongly Disagree
+                    }
+                }
+            } else if (firstUnansweredIndex === -1) {
+                // If this is the first unanswered question, set it as current
+                firstUnansweredIndex = index;
+            }
+        });
+
+        setAnswers(newAnswers);
+        if (firstUnansweredIndex === -1) {
+            // All questions answered
+            setCurrentIndex(questions.length - 1);
+        } else {
+            setCurrentIndex(firstUnansweredIndex);
+        }
+    }, [positionsData, address]);
+
     // Process transaction queue
     useEffect(() => {
         const processQueue = async () => {
-            if (isProcessingQueue || pendingTransactions.length === 0 || !address) return;
+            if (isProcessingQueue || pendingTransactions.length === 0 || !address || !positionsData?.triples) return;
 
             setIsProcessingQueue(true);
             const currentTx = pendingTransactions[0];
+            const answer = answers[currentTx.questionId];
+
+            // Skip if answer is neutral (4)
+            if (answer === 4) {
+                setTransactionStatuses(prev => ({
+                    ...prev,
+                    [currentTx.questionId]: {
+                        questionId: currentTx.questionId,
+                        status: 'success'
+                    }
+                }));
+                setPendingTransactions(prev => prev.slice(1));
+                setIsProcessingQueue(false);
+                return;
+            }
+
+            // Calculate deposit amount based on answer
+            let multiplier = 0;
+            if (answer <= 3) { // Disagree (1-3)
+                multiplier = 4 - answer; // 3x for 1, 2x for 2, 1x for 3
+            } else if (answer >= 5) { // Agree (5-7)
+                multiplier = answer - 4; // 1x for 5, 2x for 6, 3x for 7
+            }
+
+            const depositAmount = parseUnits(
+                (Number(minDeposit) * multiplier).toString(),
+                18
+            );
 
             try {
+                // Find the triple in positionsData to get the correct vault ID
+                const triple = positionsData.triples.find(t => t.id === currentTx.tripleId.toString());
+                if (!triple) {
+                    throw new Error('Triple not found in positions data');
+                }
+
+                // Get the correct vault ID based on the answer
+                const vaultId = answer <= 3 ? BigInt(triple.counter_vault_id) : BigInt(triple.vault_id);
+
                 const hash = await writeContractAsync({
                     address: MULTIVAULT_CONTRACT_ADDRESS as `0x${string}`,
                     abi: multivaultAbi as Abi,
                     functionName: 'depositTriple',
-                    args: [address as `0x${string}`, BigInt(currentTx.tripleId)],
-                    value: parseUnits('0.001', 18),
+                    args: [address as `0x${string}`, vaultId],
+                    value: depositAmount,
                     chain: baseSepolia
                 });
 
@@ -104,17 +216,24 @@ export default function Web3Assessment() {
         };
 
         processQueue();
-    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt]);
+    }, [pendingTransactions, isProcessingQueue, address, writeContractAsync, onReceipt, answers, minDeposit, positionsData]);
 
     // Hydrate once on mount (fire-and-forget)
     useEffect(() => {
         if (typeof window === "undefined" || !address) return;
         try {
             const a = sessionStorage.getItem(STORAGE_ANS);
-            if (a) setAnswers(JSON.parse(a));
-            const idx = parseInt(sessionStorage.getItem(STORAGE_IDX) || "", 10);
-            if (!isNaN(idx) && idx >= 0 && idx < total) {
-                setCurrentIndex(idx);
+            if (a) {
+                const parsedAnswers = JSON.parse(a);
+                setAnswers(parsedAnswers);
+                // Find the first unanswered question
+                const firstUnansweredIndex = questions.findIndex(q => parsedAnswers[q.id] === undefined);
+                if (firstUnansweredIndex !== -1) {
+                    setCurrentIndex(firstUnansweredIndex);
+                } else {
+                    // If all questions are answered, set to the last question
+                    setCurrentIndex(questions.length - 1);
+                }
             }
         } catch { }
     }, [total, address]);
@@ -154,7 +273,8 @@ export default function Web3Assessment() {
             if (question?.triple) {
                 setPendingTransactions(prev => [...prev, {
                     questionId: id,
-                    tripleId: question.triple.id
+                    tripleId: question.triple.id,
+                    answer: value
                 }]);
 
                 // Set initial pending status
@@ -204,8 +324,13 @@ export default function Web3Assessment() {
         [answers, router, total, address]
     );
 
-    const visible = questions.slice(0, currentIndex + 1);
+
+
     const allAnswered = Object.keys(answers).length === total;
+    const answeredCount = Object.keys(answers).length;
+    const remainingCount = total - answeredCount;
+    const visible = questions.slice(0, answeredCount);
+
 
     return (
         <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto">
@@ -220,10 +345,12 @@ export default function Web3Assessment() {
                 </div>
             )}
 
+
             <div className="flex justify-between items-center mb-6">
-                <p className="text-sm text-gray-600" aria-live="polite">
-                    Question {currentIndex + 1} of {total}
-                </p>
+                <div className="text-sm text-gray-600">
+                    <p>{answeredCount} question{answeredCount !== 1 ? 's' : ''} already replied</p>
+                    <p>{remainingCount} / {total} question{remainingCount !== 1 ? 's' : ''} left</p>
+                </div>
                 <button
                     type="submit"
                     disabled={!allAnswered || isSubmitting || !address}
@@ -233,11 +360,11 @@ export default function Web3Assessment() {
                 </button>
             </div>
 
-            {formError && (
+            {formError ? (
                 <p className="mb-4 text-red-600" role="alert">
                     {formError}
                 </p>
-            )}
+            ) : null}
 
             <div className="mb-8 h-[200px] w-full relative overflow-hidden rounded-lg">
                 <div
@@ -263,6 +390,7 @@ export default function Web3Assessment() {
                         const idx = visible.length - 1 - revIdx;
                         const isActive = idx === currentIndex;
                         const txStatus = transactionStatuses[q.id];
+                        const isAnswered = answers[q.id] !== undefined;
 
                         return (
                             <motion.div
@@ -271,7 +399,7 @@ export default function Web3Assessment() {
                                 animate={{ y: 0, opacity: isActive ? 1 : 0.5 }}
                                 exit={{ y: 10, opacity: 0 }}
                                 transition={ANIM}
-                                className={isActive ? "mb-8" : "mb-4"}
+                                className={`${isActive ? "mb-8" : "mb-4"} ${isAnswered ? "opacity-75" : ""}`}
                             >
                                 <Question
                                     id={q.id}
@@ -280,6 +408,7 @@ export default function Web3Assessment() {
                                     onChange={handleAnswerChange}
                                     isLoading={txStatus?.status === 'pending'}
                                     isSuccess={txStatus?.status === 'success'}
+                                    isAnswered={isAnswered}
                                     explorerButton={
                                         txStatus?.status === 'success' && txStatus.txHash && (
                                             <button
@@ -300,7 +429,10 @@ export default function Web3Assessment() {
                             </motion.div>
                         );
                     })}
+
             </AnimatePresence>
+
         </form>
-    );
+
+    )
 } 
