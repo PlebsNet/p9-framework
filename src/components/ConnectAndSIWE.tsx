@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getCsrfToken, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
@@ -15,35 +15,14 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [processingStep, setProcessingStep] = useState('');
-  const [shouldSignIn, setShouldSignIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
   const { signMessageAsync } = useSignMessage();
 
-  // Handle wallet connection separately
-  const handleWalletConnect = async () => {
-    try {
-      setIsLoading(true);
-      setError('');
-      setProcessingStep('Connecting wallet...');
-
-      // Connect the wallet and wait for the connection
-      await connect({ connector: cbWalletConnector });
-      console.log('✅ Wallet connection initiated');
-
-      // Flag to trigger sign-in after connection is established
-      setShouldSignIn(true);
-    } catch (e) {
-      console.error('❌ Connection error:', e);
-      setError(`Wallet connection error: ${e instanceof Error ? e.message : String(e)}`);
-      setIsLoading(false);
-      setProcessingStep('');
-    }
-  };
-
   // Handle SIWE sign-in
-  const handleSignIn = async () => {
+  const handleSignIn = useCallback(async () => {
     try {
       setIsLoading(true);
       setError('');
@@ -106,6 +85,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
         setProcessingStep('Success! Redirecting...');
         // Redirect or update UI as needed
         window.location.href = response?.url || '/';
+        setIsSignedIn(true);
       }
     } catch (e) {
       console.error('❌ Authentication error:', e);
@@ -113,22 +93,33 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
     } finally {
       setIsLoading(false);
       setProcessingStep('');
-      setShouldSignIn(false);
+    }
+  }, [isConnected, address, signMessageAsync]);
+
+  // Handle wallet connection separately
+  const handleWalletConnect = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+      setProcessingStep('Connecting wallet...');
+
+      // Connect the wallet and wait for the connection
+      await connect({ connector: cbWalletConnector });
+      console.log('✅ Wallet connection initiated');
+    } catch (e) {
+      console.error('❌ Connection error:', e);
+      setError(`Wallet connection error: ${e instanceof Error ? e.message : String(e)}`);
+      setIsLoading(false);
+      setProcessingStep('');
     }
   };
 
   // Automatically trigger sign-in when wallet connection completes
   useEffect(() => {
-    if (isConnected && address && shouldSignIn) {
-      console.log('✅ Wallet connected - address available:', address);
-      // Small delay to ensure everything is properly initialized
-      const timer = setTimeout(() => {
-        handleSignIn();
-      }, 500);
-
-      return () => clearTimeout(timer);
+    if (isConnected && !isSignedIn) {
+      handleSignIn();
     }
-  }, [isConnected, address, shouldSignIn]);
+  }, [isConnected, isSignedIn, handleSignIn]);
 
   useEffect(() => {
     if (processingStep) {
@@ -138,7 +129,6 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
 
   // Trigger the "connect wallet" flow, which will then trigger sign-in
   const handleConnectAndSignIn = () => {
-    setShouldSignIn(true);
     handleWalletConnect();
   };
 
@@ -160,7 +150,7 @@ export const ConnectAndSIWE: React.FC<ConnectAndSIWEProps> = () => {
           size="xl"
           onClick={handleSignIn}
           disabled={isLoading}
-            className="w-full text-md bg-[#0052ff] text-gray-50"
+          className="w-full text-md bg-[#0052ff] text-gray-50"
         >
           {isLoading ? 'Signing in...' : 'Sign in with Base'}
         </Button>

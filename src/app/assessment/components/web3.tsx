@@ -16,8 +16,6 @@ import { parseUnits, formatUnits } from 'viem';
 import { Abi } from 'viem';
 import { multivaultAbi } from '@/lib/abis/multivault';
 import { baseSepolia } from 'viem/chains';
-import { flushSync } from "react-dom";
-import { useMultivaultContract } from '@/hooks/useMultivaultContract';
 import { useContractRead } from 'wagmi';
 import { useGetTriplesWithPositionsQuery } from '@0xintuition/graphql';
 
@@ -60,7 +58,7 @@ export default function Web3Assessment() {
     const minDeposit = generalConfig ? formatUnits(generalConfig[3], 18) : '0.001';
 
     // Get positions for all triples
-    const { data: positionsData, isLoading: isLoadingPositions } = useGetTriplesWithPositionsQuery({
+    const { data: positionsData } = useGetTriplesWithPositionsQuery({
         where: {
             id: { _in: questions.map(q => q.triple.id) }
         },
@@ -90,7 +88,7 @@ export default function Web3Assessment() {
             if (position) {
                 // If user has shares in vault, they agreed
                 if (position.vault?.positions?.[0]?.shares > 0) {
-                    let shares = Number(position.vault?.positions?.[0]?.shares);
+                    const shares = Number(position.vault?.positions?.[0]?.shares);
                     console.log("Shares", shares);
                     if (shares > 0) { // 612202501000000
                         newAnswers[question.id] = 5; // Slightly Agree
@@ -102,7 +100,7 @@ export default function Web3Assessment() {
                 }
                 // If user has shares in counter vault, they disagreed
                 else if (position.counter_vault?.positions?.[0]?.shares > 0) {
-                    let shares = Number(position.counter_vault?.positions?.[0]?.shares);
+                    const shares = Number(position.counter_vault?.positions?.[0]?.shares);
                     console.log("Shares", shares);
                     if (shares > 0) { // 612202501000000
                         newAnswers[question.id] = 3; // Slightly Disagree

@@ -9,6 +9,7 @@ import { CURRENT_ENV } from '../../config/blockchain';
 import { getChainEnvConfig } from '../../lib/environment';
 import { parseUnits } from 'viem';
 import { multivaultAbi } from '../../lib/abis/multivault'; // Import the ABI
+import { nanoid } from 'nanoid';
 
 // Extract all triple IDs from questions
 const allTripleIds = questions.map(q => q.triple.id);
@@ -46,7 +47,7 @@ export default function TriplesPage() {
         }
 
         let sharesToRedeemBigInt: bigint;
-        let idForContractTx = BigInt(tripleIdFromCard);
+        const idForContractTx = nanoid();
         let attemptingToRedeem: "For" | "Against" | null = null;
 
         if (vaultSharesFromCard && vaultSharesFromCard > 0) {
@@ -198,6 +199,7 @@ export default function TriplesPage() {
                     })}
                 </div>
             )}
+            <p>Don&apos;t see your triple?</p>
         </div>
     );
 } 

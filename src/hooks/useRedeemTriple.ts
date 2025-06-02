@@ -13,7 +13,7 @@ export const useRedeemTriple = (contract: string) => {
 
   return useContractWriteAndWait({
     ...multivault,
-    // @ts-ignore TODO: Fix type for useContractWriteAndWait
+    // @ts-expect-error - Known issue with wagmi types
     functionName: "redeemTriple",
   });
 };
