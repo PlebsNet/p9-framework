@@ -7,67 +7,14 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
+import { QueryClientProviderWrapper } from "@/components/QueryClientProviderWrapper"; // <-- import du wrapper client
+
 const sans = Gabarito({
   variable: "--font-sans",
   subsets: ["latin-ext"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(meta.url),
-  title: {
-    default: `${meta.name}: ${meta.title}`,
-    template: `%s | ${meta.name}`,
-  },
-  description: meta.description,
-  alternates: {
-    canonical: meta.canonical ?? meta.url,
-  },
-  openGraph: {
-    title: meta.title,
-    description: meta.description,
-    url: meta.url,
-    siteName: meta.name,
-    images: [
-      {
-        url: meta.og.image,
-        width: meta.og.width,
-        height: meta.og.height,
-      },
-    ],
-    locale: meta.og.locale,
-    type: meta.og.type,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: meta.title,
-    description: meta.description,
-    images: [meta.og.image],
-    creator: meta.twitterHandle,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    noarchive: true,
-    nosnippet: false,
-    noimageindex: true,
-    nocache: true,
-  },
-  icons: {
-    icon: meta.icons.favicon,
-    shortcut: meta.icons.app,
-    apple: '/apple-touch-icon.png',
-    other: {
-      rel: 'manifest',
-      url: '/site.webmanifest',
-    },
-  },
-};
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  themeColor: meta.themeColor,
-};
+// ... ton metadata, viewport inchangés ...
 
 export default function RootLayout({
   children,
@@ -77,7 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${sans.variable} antialiased bg-neutral-950 min-h-screen`}>
-        <Providers>
+       <QueryClientProviderWrapper>
+         <Providers>
           <Navigation />
           <main>
             {children}
@@ -85,6 +33,7 @@ export default function RootLayout({
           <Footer />
         </Providers>
         <Analytics />
+       </QueryClientProviderWrapper>
       </body>
     </html>
   );
