@@ -3,7 +3,6 @@
 import { gql, useQuery } from '@apollo/client';
 import DaoCard from '@/components/DaoCard';
 
-
 const ATOMS_WITH_TAGS = gql`
   query AtomsWithTags(
     $where: atoms_bool_exp
@@ -34,13 +33,6 @@ const ATOMS_WITH_TAGS = gql`
         current_share_price
         total_shares
         position_count
-        userPosition: positions(
-          limit: 1
-          where: { account_id: { _eq: $userPositionAddress } }
-        ) {
-          shares
-          account_id
-        }
       }
       tags: as_subject_triples_aggregate(
         where: { predicate_id: { _in: $tagPredicateIds } }
@@ -95,6 +87,20 @@ const ATOMS_WITH_TAGS = gql`
   }
 `;
 
+interface Dao {
+  id: string;
+  label: string;
+  image?: string;
+  value?: {
+    thing?: {
+      description?: string;
+    };
+  };
+  vault?: {
+    position_count?: number;
+  };
+}
+
 export default function DaosPage() {
   const { data, loading, error } = useQuery(ATOMS_WITH_TAGS, {
     variables: {
@@ -102,8 +108,8 @@ export default function DaosPage() {
         _and: [
           {
             as_subject_triples: {
-              predicate_id: { _eq: "4" },
-              object_id: { _eq: "126451" }, // corresponds to "DAO" tag
+              predicate_id: { _eq: '4' },
+              object_id: { _eq: '126451' },
             },
           },
         ],
@@ -117,8 +123,6 @@ export default function DaosPage() {
     },
   });
 
-  console.log("data received from API:", data);
-
   if (loading) return <p className="p-6">Chargement des DAOs...</p>;
   if (error) return <p className="p-6 text-red-600">Erreur : {error.message}</p>;
 
@@ -127,10 +131,10 @@ export default function DaosPage() {
   }
 
   return (
-  <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {data?.atoms.map((dao: any) => (
-      <DaoCard key={dao.id} dao={dao} />
-    ))}
-  </div>
+    <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {data.atoms.map((dao: Dao) => (
+        <DaoCard key={dao.id} dao={dao} />
+      ))}
+    </div>
   );
 }
