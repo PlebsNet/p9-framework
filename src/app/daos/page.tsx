@@ -1,7 +1,8 @@
 'use client';
 
 import { gql, useQuery } from '@apollo/client';
-import Image from 'next/image';
+import DaoCard from '@/components/DaoCard';
+
 
 const ATOMS_WITH_TAGS = gql`
   query AtomsWithTags(
@@ -126,27 +127,10 @@ export default function DaosPage() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-      {data.atoms.map((dao: any) => (
-        <div key={dao.id} className="border p-4 rounded shadow bg-white">
-          {dao.image && (
-            <Image
-              src={dao.image}
-              alt={dao.label}
-              width={400}
-              height={200}
-              className="rounded object-cover w-full h-48"
-            />
-          )}
-          <h2 className="text-lg font-semibold mt-2">{dao.label}</h2>
-          <p className="text-sm text-gray-600">
-            {dao.value?.thing?.description ?? 'Aucune description'}
-          </p>
-          <p className="mt-1 text-sm text-indigo-600 font-medium">
-            Votes: {dao.vault?.position_count ?? 0}
-          </p>
-        </div>
-      ))}
-    </div>
+  <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {data?.atoms.map((dao: any) => (
+      <DaoCard key={dao.id} dao={dao} />
+    ))}
+  </div>
   );
 }
