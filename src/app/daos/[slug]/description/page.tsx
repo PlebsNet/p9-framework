@@ -24,19 +24,16 @@ const DAO_DETAILS_QUERY = gql`
 `;
 
 export default function DaoDescriptionPage() {
-  const { slug } = useParams();
-  const numericId = Number(slug);
+  const { slug } = useParams();        
+  const numericId = Number(slug);       
 
-  const skipQuery = isNaN(numericId); // évite d'exécuter si ID invalide
+  if (isNaN(numericId)) {
+    return <p className="p-6 text-red-600">Invalid DAO ID</p>;
+  }
 
   const { data, loading, error } = useQuery(DAO_DETAILS_QUERY, {
     variables: { id: numericId },
-    skip: skipQuery,
   });
-
-  if (skipQuery) {
-    return <p className="p-6 text-red-600">Invalid DAO ID</p>;
-  }
 
   const dao = data?.atoms?.[0];
 
@@ -78,7 +75,7 @@ export default function DaoDescriptionPage() {
 
       <div className="mt-4 text-sm text-gray-500">
         Total votes:{' '}
-        <span className="font-medium text-black">{dao.vault?.position_count ?? 0}</span>
+        <span className="font-medium text-white">{dao.vault?.position_count ?? 0}</span>
       </div>
     </div>
   );

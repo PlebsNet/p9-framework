@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import DaoCard from '@/components/DaoCard';
 
@@ -102,6 +103,8 @@ interface Dao {
 }
 
 export default function DaosPage() {
+  const [search, setSearch] = useState('');
+
   const { data, loading, error } = useQuery(ATOMS_WITH_TAGS, {
     variables: {
       where: {
@@ -123,18 +126,34 @@ export default function DaosPage() {
     },
   });
 
-  if (loading) return <p className="p-6">Chargement des DAOs...</p>;
-  if (error) return <p className="p-6 text-red-600">Erreur : {error.message}</p>;
+  if (loading) return <p className="p-6">Loading DAOs...</p>;
+  if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>;
 
   if (!data?.atoms || data.atoms.length === 0) {
-    return <p>Aucun DAO trouvé.</p>;
+    return <p className="p-6">No DAOs found.</p>;
   }
 
+  const filteredDaos = data.atoms.filter((dao: any) =>
+    dao.label?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {data.atoms.map((dao: Dao) => (
-        <DaoCard key={dao.id} dao={dao} />
-      ))}
+    <div className="pl-20">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <input
+          type="text"
+          placeholder="Search a DAO"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="mb-6 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {(filteredDaos ?? []).map((dao: Dao) => (
+            <DaoCard key={dao.id} dao={dao} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
