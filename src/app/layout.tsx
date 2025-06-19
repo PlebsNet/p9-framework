@@ -7,14 +7,14 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-import { QueryClientProviderWrapper } from "@/components/QueryClientProviderWrapper"; // <-- import du wrapper client
+import { QueryClientProviderWrapper } from "@/components/QueryClientProviderWrapper"; 
 
 const sans = Gabarito({
   variable: "--font-sans",
   subsets: ["latin-ext"],
 });
 
-// ... ton metadata, viewport inchangés ...
+
 
 export default function RootLayout({
   children,
