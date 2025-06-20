@@ -24,21 +24,22 @@ const DAO_DETAILS_QUERY = gql`
 `;
 
 export default function DaoDescriptionPage() {
-  const { slug } = useParams();        
-  const numericId = Number(slug);       
+  const { slug } = useParams();
+  const numericId = Number(slug);
+
+  // Use skip to avoid running the query if id is invalid
+  const { data, loading, error } = useQuery(DAO_DETAILS_QUERY, {
+    variables: { id: numericId },
+    skip: isNaN(numericId),
+  });
 
   if (isNaN(numericId)) {
     return <p className="p-6 text-red-600">Invalid DAO ID</p>;
   }
-
-  const { data, loading, error } = useQuery(DAO_DETAILS_QUERY, {
-    variables: { id: numericId },
-  });
-
-  const dao = data?.atoms?.[0];
-
   if (loading) return <p className="p-6">Loading DAO details...</p>;
   if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>;
+
+  const dao = data?.atoms?.[0];
   if (!dao) return <p className="p-6">No DAO found.</p>;
 
   return (

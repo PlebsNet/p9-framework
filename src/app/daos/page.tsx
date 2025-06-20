@@ -133,7 +133,8 @@ export default function DaosPage() {
     return <p className="p-6">No DAOs found.</p>;
   }
 
-  const filteredDaos = data.atoms.filter((dao: any) =>
+  // Use the typed Dao interface instead of any
+  const filteredDaos = data.atoms.filter((dao: Dao) =>
     dao.label?.toLowerCase().includes(search.toLowerCase())
   );
 
