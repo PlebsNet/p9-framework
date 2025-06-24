@@ -3,6 +3,7 @@
 import { gql, useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import Link from "next/link";
 
 const MEMBERS_QUERY = gql`
   query GetMembersByLabel($label: String!) {
@@ -35,7 +36,7 @@ const mockMembers: MemberTriple[] = [
   {
     subject: {
       id: 'mock-1',
-      label: 'Alice Mock',
+      label: 'Jean Mock',
       image: 'https://i.pravatar.cc/150?img=11',
       wallet_id: '0x1234...abcd',
     },
@@ -79,7 +80,11 @@ export default function MembersPage() {
       <h1 className="text-2xl font-bold mb-6">DAO Contributors</h1>
       <div className="grid grid-cols-1 divide-y border rounded-lg shadow">
         {members.map(({ subject }) => (
-          <div key={subject.id} className="flex items-center gap-4 p-4">
+          <Link
+            key={subject.id}
+            href={`/daos/${daoId}/members/${subject.id}`}
+            className="flex items-center gap-4 p-4 hover:bg-gray-100 transition"
+          >
             {subject.image && subject.image.trim() !== '' ? (
               <Image
                 src={subject.image}
@@ -99,7 +104,7 @@ export default function MembersPage() {
                 {subject.wallet_id?.slice(0, 6)}…{subject.wallet_id?.slice(-4)}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
