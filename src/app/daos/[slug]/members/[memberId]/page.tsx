@@ -1,84 +1,70 @@
 "use client";
+
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import AssessmentResults from "@/components/AssessmentResults";
-import Image from "next/image";
 
-// À remplacer par un vrai fetch si tu as une API pour les infos membres
-async function fetchMemberInfo(memberId: string) {
-    // Exemple mock, à remplacer par un vrai appel API
-    if (memberId === "mock-1") {
-        return {
-            id: "mock-1",
-            label: "Alice Mock",
-            image: "https://i.pravatar.cc/150?img=11",
-            wallet_id: "0x1234...abcd",
-        };
+export default function MembersPage() {
+  const { daoId } = useParams();
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMembers() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch all users (members) for the DAO. Adapt the endpoint as needed.
+        const res = await fetch(`/api/members?daoId=${daoId}`);
+        if (!res.ok) throw new Error("Failed to fetch members");
+        const data = await res.json();
+        setMembers(data);
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     }
-    if (memberId === "mock-2") {
-        return {
-            id: "mock-2",
-            label: "Bob Mock",
-            image: "https://i.pravatar.cc/150?img=22",
-            wallet_id: "0x5678...efgh",
-        };
-    }
-    return {
-        id: memberId,
-        label: "Unknown",
-        image: "",
-        wallet_id: "N/A",
-    };
-}
+    fetchMembers();
+  }, [daoId]);
 
-export default function MemberProfilePage() {
-    const { memberId } = useParams();
-    const [member, setMember] = useState<any>(null);
-    const [answers, setAnswers] = useState<Record<string, number> | null>(null);
+  if (loading) return <p className="p-6">Loading members...</p>;
+  if (error) return <p className="p-6 text-red-600">Error: {error}</p>;
 
-    // Récupérer les infos du membre
-    useEffect(() => {
-        fetchMemberInfo(memberId as string).then(setMember);
-    }, [memberId]);
-
-    // Récupérer les réponses d'assessment
-    useEffect(() => {
-        async function fetchAnswers() {
-            const res = await fetch(`/api/member-assessment/${memberId}`);
-            if (res.ok) {
-                setAnswers(await res.json());
-            }
-        }
-        fetchAnswers();
-    }, [memberId]);
-
-    if (!member || !answers) return <div>Chargement…</div>;
-
-    return (
-        <div className="max-w-3xl mx-auto p-4 space-y-8">
-            {/* Infos du membre */}
-            <div className="flex items-center gap-4 border-b pb-4">
-                {member.image && member.image.trim() !== "" ? (
-                    <Image
-                        src={member.image}
-                        alt={member.label}
-                        width={64}
-                        height={64}
-                        className="rounded-full"
-                    />
-                ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-2xl text-white">
-                        ?
-                    </div>
-                )}
-                <div>
-                    <h2 className="text-2xl font-bold">{member.label || "Anonymous"}</h2>
-                    <p className="text-gray-500">{member.wallet_id}</p>
-                </div>
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-bold mb-6">DAO Members</h1>
+      <div className="grid grid-cols-1 divide-y border rounded-lg shadow">
+        {members.map((member) => (
+          <Link
+            key={member.ethAddress}
+            href={`/daos/${daoId}/members/${member.ethAddress}`}
+            className="flex items-center gap-4 p-4 hover:bg-gray-100 transition"
+          >
+            {member.image && member.image.trim() !== '' ? (
+              <Image
+                src={member.image}
+                alt={member.name || member.ethAddress}
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-xs text-white">
+                ?
+              </div>
+            )}
+            <div>
+              <p className="font-semibold">{member.name || 'Anonymous'}</p>
+              <p className="text-sm text-gray-500">
+                {member.ethAddress?.slice(0, 6)}…{member.ethAddress?.slice(-4)}
+              </p>
             </div>
-
-            {/* Résultats d'assessment */}
-            <AssessmentResults answers={answers} />
-        </div>
-    );
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }

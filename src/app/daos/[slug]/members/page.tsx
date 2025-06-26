@@ -1,112 +1,75 @@
-'use client';
+"use client";
+import { gql, useQuery } from "@apollo/client";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import AssessmentResults from "@/components/AssessmentResults";
+import { useAssessmentScores } from "@/hooks/useAssessmentScores";
 
-import { gql, useQuery } from '@apollo/client';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import Link from "next/link";
-
-const MEMBERS_QUERY = gql`
-  query GetMembersByLabel($label: String!) {
-    atoms(where: { label: { _eq: $label } }) {
+const MEMBER_PROFILE_QUERY = gql`
+  query GetMemberProfile($memberId: String!) {
+    users(where: { id: { _eq: $memberId } }) {
       id
-      as_object_triples(where: { predicate_id: { _eq: 1 } }) {
-        subject {
-          id
-          label
-          image
-          wallet_id
-        }
-      }
+      name
+      image
+      ethAddress
+      answers
     }
   }
 `;
 
-interface MemberSubject {
-  id: string;
-  label: string;
-  image?: string;
-  wallet_id?: string;
-}
+export default function MemberProfilePage() {
+  const { memberId } = useParams();
 
-interface MemberTriple {
-  subject: MemberSubject;
-}
-
-const mockMembers: MemberTriple[] = [
-  {
-    subject: {
-      id: 'mock-1',
-      label: 'Jean Mock',
-      image: 'https://i.pravatar.cc/150?img=11',
-      wallet_id: '0x1234...abcd',
-    },
-  },
-  {
-    subject: {
-      id: 'mock-2',
-      label: 'Bob Mock',
-      image: 'https://i.pravatar.cc/150?img=22',
-      wallet_id: '0x5678...efgh',
-    },
-  },
-  {
-    subject: {
-      id: 'mock-3',
-      label: 'Charlie Mock',
-      image: '',
-      wallet_id: '0x9abc...1234',
-    },
-  },
-];
-
-export default function MembersPage() {
-  const { daoId } = useParams();
-  const label = decodeURIComponent(daoId as string);
-
-  const { data, loading, error } = useQuery(MEMBERS_QUERY, {
-    variables: { label },
+  const { data, loading, error } = useQuery(MEMBER_PROFILE_QUERY, {
+    variables: { memberId },
   });
 
-  const members: MemberTriple[] =
-    data?.atoms?.[0]?.as_object_triples?.length > 0
-      ? data.atoms[0].as_object_triples
-      : mockMembers;
+  const member = data?.users?.[0];
 
-  if (loading) return <p className="p-6">Loading members...</p>;
-  if (error) return <p className="p-6 text-red-600">Error: {error.message}</p>;
+  // Use the hook to calculate the profil
+  const { profile } = useAssessmentScores(member?.answers);
+  const primaryArchetype = profile?.[0];
+
+  if (loading) return <div>Loading…</div>;
+  if (error) return <div className="text-red-600">Error: {error.message}</div>;
+  if (!member) return <div>No member found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold mb-6">DAO Contributors</h1>
-      <div className="grid grid-cols-1 divide-y border rounded-lg shadow">
-        {members.map(({ subject }) => (
-          <Link
-            key={subject.id}
-            href={`/daos/${daoId}/members/${subject.id}`}
-            className="flex items-center gap-4 p-4 hover:bg-gray-100 transition"
-          >
-            {subject.image && subject.image.trim() !== '' ? (
-              <Image
-                src={subject.image}
-                alt={subject.label}
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-xs text-white">
-                ?
-              </div>
-            )}
-            <div>
-              <p className="font-semibold">{subject.label || 'Anonymous'}</p>
-              <p className="text-sm text-gray-500">
-                {subject.wallet_id?.slice(0, 6)}…{subject.wallet_id?.slice(-4)}
-              </p>
+    <div className="max-w-3xl mx-auto p-4 space-y-8">
+      {/* Member info */}
+      <div className="flex items-center gap-4 border-b pb-4">
+        {member.image ? (
+          <Image
+            src={member.image}
+            alt={member.name || member.ethAddress}
+            width={64}
+            height={64}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-2xl text-white">
+            ?
+          </div>
+        )}
+        <div>
+          <h2 className="text-2xl font-bold">{member.name || "Anonymous"}</h2>
+          <p className="text-gray-500">{member.ethAddress}</p>
+          {/* Show the main archetype */}
+          {primaryArchetype && (
+            <div className="mt-2">
+              <span className="font-semibold">Main archetype: </span>
+              <span>{primaryArchetype.name}</span>
             </div>
-          </Link>
-        ))}
+          )}
+        </div>
       </div>
+
+      {/* Assessment results */}
+      {member.answers ? (
+        <AssessmentResults answers={member.answers} />
+      ) : (
+        <div className="text-gray-500">No assessment results available.</div>
+      )}
     </div>
   );
 }

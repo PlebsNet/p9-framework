@@ -7,7 +7,7 @@ import { gql, useQuery } from '@apollo/client';
 import Image from 'next/image';
 
 const DAO_QUERY = gql`
-  query GetDaoById($id: String!) {
+  query GetDaoById($id: numeric!) {
     atoms(where: { id: { _eq: $id } }) {
       id
       label
@@ -27,7 +27,7 @@ export default function DaosLayout({ children }: { children: ReactNode }) {
 
   const { data } = useQuery(DAO_QUERY, {
     skip: isMainPage || !daoId,
-    variables: { id: daoId },
+    variables: { id: Number(daoId) },
   });
 
   const dao = data?.atoms?.[0];
