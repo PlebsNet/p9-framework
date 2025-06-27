@@ -1,70 +1,149 @@
 "use client";
 
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useAssessmentScores } from "@/hooks/useAssessmentScores";
+import { ArchetypeAvatars } from "@/components/ArchetypeAvatars";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-export default function MembersPage() {
-  const { daoId } = useParams();
-  const [members, setMembers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// --- MOCK DATA for local testing ---
+const members = [
+  {
+    id: "mock-1",
+    name: "Alvin Mock",
+    image: "https://i.pravatar.cc/150?img=11",
+    ethAddress: "0x1234...abcd",
+    answers: { Q1: 2, Q2: 1, Q3: 3, Q4: 0, Q5: 2 },
+  },
+  {
+    id: "mock-2",
+    name: "Bob Mock",
+    image: "https://i.pravatar.cc/150?img=12",
+    ethAddress: "0x5678...efgh",
+    answers: { Q1: 1, Q2: 2, Q3: 2, Q4: 1, Q5: 3 },
+  },
+  {
+    id: "mock-3",
+    name: "Charlie Mock",
+    image: "https://i.pravatar.cc/150?img=13",
+    ethAddress: "0x9abc...ijkl",
+    answers: { Q1: 3, Q2: 0, Q3: 1, Q4: 2, Q5: 2 },
+  },
+  {
+    id: "mock-4",
+    name: "Damien Mock",
+    image: "https://i.pravatar.cc/150?img=14",
+    ethAddress: "0xmnop...qrst",
+    answers: { Q1: 2, Q2: 2, Q3: 2, Q4: 2, Q5: 2 },
+  },
+  {
+    id: "mock-5",
+    name: "Meven Mock",
+    image: "https://i.pravatar.cc/150?img=15",
+    ethAddress: "0xuvwx...yzab",
+    answers: { Q1: 0, Q2: 3, Q3: 1, Q4: 3, Q5: 0 },
+  },
+];
 
-  useEffect(() => {
-    async function fetchMembers() {
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch all users (members) for the DAO. Adapt the endpoint as needed.
-        const res = await fetch(`/api/members?daoId=${daoId}`);
-        if (!res.ok) throw new Error("Failed to fetch members");
-        const data = await res.json();
-        setMembers(data);
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMembers();
-  }, [daoId]);
+export default function MemberProfilePage() {
+  const { memberId } = useParams();
+  const member = members.find((m) => m.id === memberId);
 
-  if (loading) return <p className="p-6">Loading members...</p>;
-  if (error) return <p className="p-6 text-red-600">Error: {error}</p>;
+  if (!member) {
+    return (
+      <div className="max-w-3xl mx-auto p-4">
+        <p className="text-red-600">Member not found.</p>
+        <Link href="/daos/slug/members" className="text-blue-500 underline">
+          ← Back to members
+        </Link>
+      </div>
+    );
+  }
+
+  const { profile } = useAssessmentScores(member.answers);
+  const primaryArchetype = profile?.[0];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold mb-6">DAO Members</h1>
-      <div className="grid grid-cols-1 divide-y border rounded-lg shadow">
-        {members.map((member) => (
-          <Link
-            key={member.ethAddress}
-            href={`/daos/${daoId}/members/${member.ethAddress}`}
-            className="flex items-center gap-4 p-4 hover:bg-gray-100 transition"
-          >
-            {member.image && member.image.trim() !== '' ? (
-              <Image
-                src={member.image}
-                alt={member.name || member.ethAddress}
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-xs text-white">
-                ?
+    <div className="max-w-3xl mx-auto p-4 space-y-6">
+
+
+      {/* Member info */}
+      <div className="flex items-center gap-4 p-4 bg-gray-900 rounded-lg border border-amber-400/30 shadow-lg">
+        {member.image ? (
+          <Image
+            src={member.image}
+            alt={member.name || member.ethAddress}
+            width={80}
+            height={80}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-3xl text-white">
+            ?
+          </div>
+        )}
+        <div>
+          <h1 className="text-3xl font-bold text-white">{member.name || "Anonymous"}</h1>
+          <p className="text-gray-400">{member.ethAddress}</p>
+        </div>
+      </div>
+
+      {/* Archetype card */}
+      {primaryArchetype && (
+        <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+          {/* First div: Logo on left, title and description on right */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="text-lg">
+              {ArchetypeAvatars[primaryArchetype.slug as keyof typeof ArchetypeAvatars] || "👤"}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-white mb-2">{primaryArchetype.name}</h2>
+              <p className="text-gray-300">{primaryArchetype.description}</p>
+            </div>
+          </div>
+          
+          {/* Second div: Strengths, challenges, recommendations in gray sub-cards */}
+          <div className="space-y-4">
+            {/* Strengths */}
+            {primaryArchetype.strengths && primaryArchetype.strengths.length > 0 && (
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-amber-300 mb-2">Strengths</h3>
+                <ul className="list-disc list-inside text-gray-100 space-y-1">
+                  {primaryArchetype.strengths.map((strength, index) => (
+                    <li key={index}>{strength}</li>
+                  ))}
+                </ul>
               </div>
             )}
-            <div>
-              <p className="font-semibold">{member.name || 'Anonymous'}</p>
-              <p className="text-sm text-gray-500">
-                {member.ethAddress?.slice(0, 6)}…{member.ethAddress?.slice(-4)}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+            
+            {/* Challenges */}
+            {primaryArchetype.challenges && primaryArchetype.challenges.length > 0 && (
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-amber-300 mb-2">Challenges</h3>
+                <ul className="list-disc list-inside text-gray-100 space-y-1">
+                  {primaryArchetype.challenges.map((challenge, index) => (
+                    <li key={index}>{challenge}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {/* Recommendations */}
+            {primaryArchetype.recommendations && primaryArchetype.recommendations.length > 0 && (
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-amber-300 mb-2">Recommendations</h3>
+                <ul className="list-disc list-inside text-gray-100 space-y-1">
+                  {primaryArchetype.recommendations.map((recommendation, index) => (
+                    <li key={index}>{recommendation}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
