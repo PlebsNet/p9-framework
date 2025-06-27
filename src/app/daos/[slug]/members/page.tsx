@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useAssessmentScores } from "@/hooks/useAssessmentScores";
+
 
 // --- MOCK DATA for local testing ---
 // Remove this block when switching to real data
@@ -44,8 +44,8 @@ const members = [
 ];
 export default function MembersPage() {
   // MOCK: Use mock data for local visualization
-  const { profile } = useAssessmentScores(members[0].answers);
-  const primaryArchetype = profile?.[0];
+
+
 
   // --- REAL DATA: Uncomment this block and remove the mock above---
   /*

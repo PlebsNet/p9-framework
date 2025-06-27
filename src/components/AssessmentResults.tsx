@@ -1,15 +1,11 @@
 "use client";
 import { useAssessmentScores } from "@/hooks/useAssessmentScores";
-import ArchetypeRadar from "@/components/ArchetypeRadar";
-import PracticalApplications from "@/components/PracticalApplications";
-import PersonalizedInsights from "@/components/PersonalizedInsights";
-import LabelFeedback from "@/components/LabelFeedback";
 import { ArchetypeAvatars } from "@/components/ArchetypeAvatars";
 
 export default function AssessmentResults({ answers }: { answers: Record<string, number> }) {
-    const { dimData, profile } = useAssessmentScores(answers);
+    const {profile } = useAssessmentScores(answers);
 
-    if (!profile) return <div>Chargement…</div>;
+    if (!profile) return <div>Loading...</div>;
 
     const primary = profile[0];
 

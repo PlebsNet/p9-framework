@@ -41,7 +41,7 @@ export default function DaosLayout({ children }: { children: ReactNode }) {
               href="/daos"
               className="inline-flex items-center gap-2 text-sm text-gray-700 font-medium hover:text-black hover:bg-gray-200 transition rounded px-2 py-1 mb-4"
             >
-              <span className="text-lg">←</span> Back to DAO's list
+              <span className="text-lg">←</span> Back to DAO&apos;s list
             </Link>
 
             <div className="ml-4">
